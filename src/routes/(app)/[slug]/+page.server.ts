@@ -40,9 +40,11 @@ export const actions: Actions = {
 				error: 'Incomplete details'
 			});
 		}
+		const unit_amount_decimal = (parseFloat(amount) * 100).toFixed(2);
+		console.log(unit_amount_decimal);
 		const price = await stripe.prices.create({
 			currency: 'usd',
-			unit_amount_decimal: JSON.stringify(parseFloat(amount) * 100),
+			unit_amount_decimal,
 			product: campaignId
 		});
 		const session = await stripe.checkout.sessions.create({
