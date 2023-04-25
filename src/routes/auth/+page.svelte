@@ -36,7 +36,7 @@
 				await applyAction(result);
 			};
 		}}
-		class="w-full h-full flex flex-col gap-3 items-center justify-center"
+		class="absolute w-full h-full flex flex-col gap-3 items-center justify-center z-10"
 		in:fly={{ x: 300, duration, delay: duration }}
 		out:fly={{ duration }}
 	>
@@ -111,7 +111,7 @@
 				await applyAction(result);
 			};
 		}}
-		class="w-full h-full flex flex-col gap-3 items-center justify-center"
+		class="absolute w-full h-full flex flex-col gap-3 items-center justify-center z-10"
 		in:fly={{ x: 300, duration, delay: duration }}
 		out:fly={{ duration }}
 	>
