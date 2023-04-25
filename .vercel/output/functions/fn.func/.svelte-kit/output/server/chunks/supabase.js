@@ -1,0 +1,4 @@
+import { createClient } from "@supabase/auth-helpers-sveltekit";
+const PUBLIC_SUPABASE_URL = "https://ukuxxbgqtlxmsbdxedtb.supabase.co";
+const PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVrdXh4YmdxdGx4bXNiZHhlZHRiIiwicm9sZSI6ImFub24iLCJpYXQiOjE2ODE4OTQ5MTksImV4cCI6MTk5NzQ3MDkxOX0.M5zu2SaLfF3PyaS6S4nckK1ShbjQcToIacFsP3RhK3M";
+createClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY);

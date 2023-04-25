@@ -1,0 +1,10 @@
+const DOMAIN_ADDRESS = "http://localhost:5173";
+const API_KEY = "c7289033-bbe8-458c-9268-67554b0af3c9";
+const STRIPE_SECRET_KEY = "sk_test_51N0SbWSC1dm6G5kw7oBm2atTQFk4Nz7IJkyQbWWTYq80k0zD6VKkHx9p11xSyi4SyoixNM1Xxo2wPubc6IcDtgna00m0OyHAvb";
+const STRIPE_WEBHOOK_SECRET = "whsec_oEYfNGO5dqKRx8dfWmiGgnct0Q1UONtP";
+export {
+  API_KEY as A,
+  DOMAIN_ADDRESS as D,
+  STRIPE_WEBHOOK_SECRET as S,
+  STRIPE_SECRET_KEY as a
+};
