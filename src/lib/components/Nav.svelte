@@ -55,7 +55,7 @@
 						>
 							<button
 								type="submit"
-								class="group w-full relative p-2 items-center flex justify-center -lg:justify-start gap-2 rounded-3xl bg-light-muted {link.active &&
+								class="group w-full relative p-2 items-center flex justify-center -lg:justify-start gap-2 rounded-3xl {link.active &&
 									'bg-accent text-skin-inverted'} hover:bg-accent hover:text-dominant hyperlink hover:rounded-lg transition-all duration-300 "
 							>
 								<div>
@@ -72,7 +72,7 @@
 				{:else}
 					<li class="-lg:w-full">
 						<a
-							class="group w-full relative p-2 items-center flex justify-center -lg:justify-start gap-2 rounded-3xl bg-light-muted {link.active &&
+							class="group w-full relative p-2 items-center flex justify-center -lg:justify-start gap-2 rounded-3xl {link.active &&
 								'bg-accent text-skin-inverted'} hover:bg-accent hover:text-dominant hyperlink hover:rounded-lg transition-all duration-300"
 							href={link.href}
 						>

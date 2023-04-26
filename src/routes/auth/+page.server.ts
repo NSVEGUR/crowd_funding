@@ -27,7 +27,6 @@ export const actions: Actions = {
 					error: 'Invalid password or email'
 				});
 			}
-			console.log(err);
 			return fail(500, {
 				error: 'Server error. Please try again later'
 			});

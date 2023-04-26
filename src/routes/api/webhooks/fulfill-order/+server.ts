@@ -24,9 +24,10 @@ export const POST: RequestHandler = async ({ request }) => {
 		const session = await stripe.checkout.sessions.retrieve(checkoutSession.id, {
 			expand: ['line_items']
 		});
-		const { amount_total, customer_details, line_items } = session;
-		if (amount_total && line_items && line_items.data.length > 0) {
+		const { amount_total, customer_details, line_items, metadata } = session;
+		if (amount_total && line_items && line_items.data.length > 0 && metadata) {
 			const { price } = line_items.data[0];
+			const visibility = metadata.visibility as string;
 			if (price && price.product && customer_details && customer_details.email) {
 				const campaign = await prisma.campaign.findUnique({
 					where: {
@@ -38,20 +39,31 @@ export const POST: RequestHandler = async ({ request }) => {
 				}
 				const donation = amount_total / 100;
 				const amountCollected = campaign.amountCollected + donation;
-				await prisma.campaign.update({
-					where: {
-						id: campaign.id
-					},
-					data: {
-						amountCollected: amountCollected,
-						donations: {
-							push: donation
+				if (visibility == 'true') {
+					await prisma.campaign.update({
+						where: {
+							id: campaign.id
 						},
-						donators: {
-							push: customer_details.email
+						data: {
+							amountCollected: amountCollected,
+							donations: {
+								push: donation
+							},
+							donators: {
+								push: customer_details.email
+							}
 						}
-					}
-				});
+					});
+				} else {
+					await prisma.campaign.update({
+						where: {
+							id: campaign.id
+						},
+						data: {
+							amountCollected: amountCollected
+						}
+					});
+				}
 			}
 		} else {
 			return json({ error: 'Invalid line items or customer details' }, { status: 400 });

@@ -35,13 +35,13 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const amount = data.get('amount') as string;
 		const campaignId = data.get('campaignId') as string;
+		const visibility = data.get('visibility') as string;
 		if (!data || !amount) {
 			return fail(400, {
 				error: 'Incomplete details'
 			});
 		}
-		const unit_amount_decimal = (parseFloat(amount) * 100).toFixed(2);
-		console.log(unit_amount_decimal);
+		const unit_amount_decimal = (parseFloat(amount) * 100).toFixed(4);
 		const price = await stripe.prices.create({
 			currency: 'usd',
 			unit_amount_decimal,
@@ -51,7 +51,10 @@ export const actions: Actions = {
 			line_items: [{ price: price.id, quantity: 1 }],
 			mode: 'payment',
 			success_url: DOMAIN_ADDRESS + '/payments/success',
-			cancel_url: DOMAIN_ADDRESS + '/payments/cancel'
+			cancel_url: DOMAIN_ADDRESS + '/payments/cancel',
+			metadata: {
+				visibility: visibility
+			}
 		});
 		throw redirect(302, session.url ?? '/payments/cancel');
 	}

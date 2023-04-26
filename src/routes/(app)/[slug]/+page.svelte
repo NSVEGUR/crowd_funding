@@ -1,13 +1,17 @@
 <script lang="ts">
 	import { applyAction, enhance } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
+	import { snackbar } from '$lib/stores/snackbar';
 	import Profile from '$lib/images/profile.png';
 	import { getDaysLeft } from '$lib/utils/date';
 	import type { PageData } from './$types';
+	import { getNewLabel } from '$lib/utils/label';
+	import { blur } from 'svelte/transition';
 	export let data: PageData;
+	let toggleDonators = true;
 </script>
 
-<section class="pb-10">
+<section class="w-full h-full pb-10 overflow-scroll">
 	<div class="relative rounded-lg group overflow-hidden">
 		<img
 			src={data.campaign.image}
@@ -60,10 +64,28 @@
 				<p class="text-skin-muted text-justify">{data.campaign.story}</p>
 			</div>
 			<div>
-				<h1 class="text-xl font-medium my-2">Donators</h1>
 				{#if data.campaign.donators.length > 0}
-					<p class="text-skin-muted">{data.campaign.donators.length}</p>
+					<h1 class="relative text-xl font-medium my-2">
+						Donators<span class="absolute bottom-1 text-accent font-normal ml-3 text-sm"
+							><button
+								class="underline"
+								on:click={() => {
+									toggleDonators = !toggleDonators;
+								}}>{toggleDonators ? 'Hide' : 'Show'}</button
+							></span
+						>
+					</h1>
+					{#if toggleDonators}
+						<div class="flex flex-wrap gap-1" transition:blur>
+							{#each data.campaign.donators as donator, index}
+								<p style="background: {getNewLabel(index)};" class="p-1 rounded-md text-sm">
+									{donator}
+								</p>
+							{/each}
+						</div>
+					{/if}
 				{:else}
+					<h1 class="text-xl font-medium my-2">Donators</h1>
 					<p class="text-skin-muted">No donators yet. Be the first one!</p>
 				{/if}
 			</div>
@@ -74,8 +96,10 @@
 				action="?/donate"
 				method="POST"
 				use:enhance={({ data: formData }) => {
+					snackbar.promise('Redirecting to payment page...');
 					formData.append('campaignId', `${data.campaign.id}`);
 					return async function ({ result }) {
+						snackbar.success('Redirected');
 						if (result.type == 'success') {
 							invalidateAll();
 						}
@@ -83,6 +107,7 @@
 					};
 				}}
 			>
+				<label for="amount">Donation</label>
 				<input
 					type="number"
 					name="amount"
@@ -91,6 +116,11 @@
 					placeholder="Dollars &#36;"
 					class="bg-transparent border-[1px] border-base focus:outline-none p-3 rounded-lg"
 				/>
+				<label for="visibility">Donator visibility: </label>
+				<select name="visibility" class="p-3 bg-light-muted rounded-lg focus:outline-none">
+					<option value="true">Show</option>
+					<option value="false">Hidden</option>
+				</select>
 				<button class="bg-accent text-dominant p-3 rounded-lg">Donate</button>
 			</form>
 		</div>
