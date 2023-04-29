@@ -51,7 +51,6 @@ export const actions: Actions = {
 		const amount = data.get('amount') as string;
 		const campaignId = data.get('campaignId') as string;
 		const anonymous = data.get('anonymous') as string;
-		console.log(anonymous);
 		if (!amount || !campaignId || !anonymous) {
 			return fail(400, {
 				error: 'Incomplete details'

@@ -202,7 +202,11 @@
 				class="flex flex-col gap-2"
 				action="?/donate"
 				method="POST"
-				use:enhance={({ data }) => {
+				use:enhance={({ data, cancel }) => {
+					if (!amount) {
+						snackbar.error('Please provide amount');
+						return cancel();
+					}
 					snackbar.promise('Redirecting to payment page...');
 					data.append('campaignId', `${campaign.id}`);
 					data.append('amount', `${amount}`);
@@ -444,7 +448,11 @@
 					class="flex flex-col gap-2"
 					action="?/donate"
 					method="POST"
-					use:enhance={({ data }) => {
+					use:enhance={({ data, cancel }) => {
+						if (!amount) {
+							snackbar.error('Please provide amount');
+							return cancel();
+						}
 						snackbar.promise('Redirecting to payment page...');
 						data.append('campaignId', `${campaign.id}`);
 						data.append('amount', `${amount}`);
