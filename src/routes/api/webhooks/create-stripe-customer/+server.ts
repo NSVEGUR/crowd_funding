@@ -15,18 +15,41 @@ export const POST: RequestHandler = async ({ url, request }) => {
 		return json({ error: 'Invalid body' }, { status: 400 });
 	}
 	const user = parsedBody.data;
-	const stripeCustomer = await stripe.customers.create({
-		email: user.email
-	});
 	try {
-		await prisma.user.update({
+		const stripeUser = await prisma.stripeUser.findUnique({
 			where: {
-				id: user.id
-			},
-			data: {
-				customerId: stripeCustomer.id
+				email: user.email
 			}
 		});
+		const newUser = await prisma.user.findUnique({
+			where: {
+				email: user.email
+			}
+		});
+		if (!newUser) {
+			return json({ error: 'Failed to update user' }, { status: 500 });
+		}
+		if (!stripeUser) {
+			const stripeCustomer = await stripe.customers.create({
+				email: user.email
+			});
+			await prisma.stripeUser.create({
+				data: {
+					id: stripeCustomer.id,
+					email: user.email,
+					userId: newUser.id
+				}
+			});
+		} else {
+			await prisma.stripeUser.update({
+				where: {
+					id: stripeUser.id
+				},
+				data: {
+					userId: newUser.id
+				}
+			});
+		}
 	} catch (err) {
 		return json({ error: 'Failed to update user' }, { status: 500 });
 	}

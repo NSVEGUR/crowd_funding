@@ -27,7 +27,7 @@
 <section class="flex h-[calc(100vh-theme(spacing.12))">
 	<!-- Navigation -->
 	<nav
-		class="h-screen border-r-[1px] border-base bg-muted -lg:fixed -lg:z-50 -lg:w-2/3 {$toggleNav
+		class="h-screen border-r-[1px] border-base bg-dominant -lg:fixed -lg:z-50 -lg:w-2/3 {$toggleNav
 			? '-lg:-translate-x-0'
 			: '-lg:-translate-x-full'} transition-all duration-300 overflow-hidden
 			"
@@ -56,7 +56,7 @@
 							<button
 								type="submit"
 								class="group w-full relative p-2 items-center flex justify-center -lg:justify-start gap-2 rounded-3xl {link.active &&
-									'bg-accent text-skin-inverted'} hover:bg-accent hover:text-dominant hyperlink hover:rounded-lg transition-all duration-300 "
+									'bg-accent text-skin-inverted'} hover:bg-accent hover:text-skin-inverted hyperlink hover:rounded-lg transition-all duration-300 "
 							>
 								<div>
 									<svelte:component this={link.icon} />
@@ -73,7 +73,7 @@
 					<li class="-lg:w-full">
 						<a
 							class="group w-full relative p-2 items-center flex justify-center -lg:justify-start gap-2 rounded-3xl {link.active &&
-								'bg-accent text-skin-inverted'} hover:bg-accent hover:text-dominant hyperlink hover:rounded-lg transition-all duration-300"
+								'bg-accent text-skin-inverted'} hover:bg-accent hover:text-skin-inverted hyperlink hover:rounded-lg transition-all duration-300"
 							href={link.href}
 						>
 							<div>
@@ -90,7 +90,7 @@
 			{/each}
 		</ul>
 	</nav>
-	<section class="p-10 bg-muted h-screen w-full overflow-scroll -sm:p-3">
+	<section class="p-10 h-screen w-full overflow-scroll -sm:p-3">
 		<slot><!-- optional fallback --></slot>
 	</section>
 </section>

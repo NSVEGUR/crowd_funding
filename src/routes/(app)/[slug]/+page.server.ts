@@ -10,6 +10,21 @@ export const load: PageServerLoad = async ({ params }) => {
 			id: params.slug
 		},
 		include: {
+			donations: {
+				select: {
+					anonymous: true,
+					amount: true,
+					user: {
+						select: {
+							name: true,
+							email: true
+						}
+					}
+				},
+				orderBy: {
+					amount: 'desc'
+				}
+			},
 			user: {
 				select: {
 					email: true,
@@ -35,8 +50,9 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const amount = data.get('amount') as string;
 		const campaignId = data.get('campaignId') as string;
-		const visibility = data.get('visibility') as string;
-		if (!data || !amount) {
+		const anonymous = data.get('anonymous') as string;
+		console.log(anonymous);
+		if (!amount || !campaignId || !anonymous) {
 			return fail(400, {
 				error: 'Incomplete details'
 			});
@@ -50,10 +66,13 @@ export const actions: Actions = {
 		const session = await stripe.checkout.sessions.create({
 			line_items: [{ price: price.id, quantity: 1 }],
 			mode: 'payment',
+			phone_number_collection: {
+				enabled: true
+			},
 			success_url: DOMAIN_ADDRESS + '/payments/success',
 			cancel_url: DOMAIN_ADDRESS + '/payments/cancel',
 			metadata: {
-				visibility: visibility
+				anonymous: anonymous
 			}
 		});
 		throw redirect(302, session.url ?? '/payments/cancel');

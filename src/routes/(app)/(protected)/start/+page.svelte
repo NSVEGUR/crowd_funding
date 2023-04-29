@@ -2,22 +2,16 @@
 	import { enhance, applyAction } from '$app/forms';
 	import { snackbar } from '$lib/stores/snackbar';
 	import { invalidateAll } from '$app/navigation';
-	import { writable } from 'svelte/store';
 	import type { ActionData } from './$types';
+	import { redirect } from '@sveltejs/kit';
 	export let form: ActionData;
 
-	const error = writable('');
-
-	$: if (form?.error) {
-		$error = form.error;
-	} else {
-		$error = '';
-	}
+	let type = 'Personal';
 </script>
 
 <section class="w-full h-full pb-10 relative z-10">
 	<div class="flex w-full items-center justify-center">
-		<h1 class="text-center text-skin-base font-medium text-2xl">Start a Campaign</h1>
+		<h1 class="text-center text-skin-base font-bold text-4xl">Start a Campaign</h1>
 	</div>
 	<form
 		action="?/create"
@@ -27,10 +21,8 @@
 			return async function ({ result }) {
 				if (result.type == 'success' || result.type == 'redirect') {
 					snackbar.success('Created campaign successfully');
-					form.reset();
-					invalidateAll();
 				} else if (result.type == 'failure' || result.type == 'error') {
-					snackbar.error($error.length > 0 ? $error : 'Error in creating');
+					snackbar.error('Error in creating');
 				}
 				await applyAction(result);
 			};
@@ -45,7 +37,7 @@
 					name="name"
 					required
 					minlength="3"
-					class="bg-transparent border-[1px] focus:outline-none border-base h-12 rounded-lg w-full p-5"
+					class="bg-dominant border-[1px] focus:outline-none border-base h-12 rounded-lg w-full p-5"
 					placeholder="Jhon"
 				/>
 			</div>
@@ -55,11 +47,30 @@
 					type="text"
 					name="title"
 					minlength="5"
-					class="bg-transparent border-[1px] focus:outline-none border-base h-12 rounded-lg w-full p-5"
+					class="bg-dominant border-[1px] focus:outline-none border-base h-12 rounded-lg w-full p-5"
 					placeholder="Title"
 				/>
 			</div>
 		</div>
+		<label for="type" class="text-skin-muted">Campaign Type *</label>
+		<select name="type" class="p-3 bg-dominant rounded-lg focus:outline-none" bind:value={type}>
+			<option value="Personal">Personal</option>
+			<option value="Education">Education</option>
+			<option value="NGO">NGO</option>
+			<option value="Others">Others</option>
+		</select>
+		{#if type === 'Others'}
+			<div class="flex flex-col gap-2 w-full items-center justify-center">
+				<label for="others" class="self-start text-skin-muted">Campaign Type Name(others)*</label>
+				<input
+					type="text"
+					name="others"
+					required
+					class="w-full bg-domniant focus:outline-none border-[1px] h-12 border-base rounded-lg p-5"
+					placeholder="Environment"
+				/>
+			</div>
+		{/if}
 		<div class="flex flex-col gap-2 w-full items-center">
 			<label for="story" class="self-start text-skin-muted">Story*</label>
 			<textarea
@@ -68,7 +79,7 @@
 				minlength="10"
 				rows="10"
 				required
-				class="bg-transparent border-[1px] focus:outline-none border-base rounded-lg w-full p-5"
+				class="bg-dominant border-[1px] focus:outline-none border-base rounded-lg w-full p-5"
 				placeholder="Write your story..."
 			/>
 		</div>
@@ -80,7 +91,7 @@
 					name="goal"
 					step="0.1"
 					required
-					class="bg-transparent border-[1px] focus:outline-none border-base h-12 rounded-lg w-full p-5"
+					class="bg-dominant border-[1px] focus:outline-none border-base h-12 rounded-lg w-full p-5"
 					placeholder="Dollars &#36;"
 				/>
 			</div>
@@ -90,24 +101,28 @@
 					type="date"
 					name="date"
 					required
-					class="bg-transparent border-[1px] focus:outline-none border-base h-12 rounded-lg w-full p-5 text-skin-base"
+					class="bg-dominant border-[1px] focus:outline-none border-base h-12 rounded-lg w-full p-5 text-skin-base"
 				/>
 			</div>
 		</div>
-		<div class="flex flex-col gap-2 w-full items-center">
+		<div class="flex flex-col gap-2 w-full items-center justify-center">
 			<label for="image" class="self-start text-skin-muted">Campaign image*</label>
 			<input
-				type="url"
-				name="image"
+				type="file"
+				name="file"
 				required
-				class="w-full bg-transparent focus:outline-none border-[1px] border-base rounded-lg p-5 h-12"
+				accept="image/*"
+				class="w-full bg-domniant focus:outline-none border-[1px] border-base rounded-lg p-5"
 				placeholder="Image URL of your campaign"
 			/>
 		</div>
+		{#if form?.error}
+			<p class="text-skin-error text-center">{form.error}</p>
+		{/if}
 		<div class="flex w-full items-center justify-center">
 			<button
 				type="submit"
-				class="text-center bg-accent text-skin-inverted font-medium text-lg p-2 px-3 rounded-lg"
+				class="text-center bg-accent text-skin-base font-medium text-lg p-2 px-3 rounded-lg"
 				>Submit new campaign</button
 			>
 		</div>
@@ -115,7 +130,9 @@
 </section>
 
 <style>
-	::-webkit-calendar-picker-indicator {
-		filter: invert(1);
+	input::-webkit-outer-spin-button,
+	input::-webkit-inner-spin-button {
+		-webkit-appearance: none;
+		margin: 0;
 	}
 </style>

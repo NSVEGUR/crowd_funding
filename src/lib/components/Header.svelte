@@ -4,7 +4,7 @@
 	import SearchSVG from '$lib/svg/Search.svelte';
 	import BarsSVG from '$lib/svg/Bars.svelte';
 	import Command from '$lib/svg/Command.svelte';
-	import { toggleNav, toggleMenu } from '$lib/stores';
+	import { toggleNav, toggleMenu, search } from '$lib/stores';
 	import type { Session } from '@supabase/supabase-js';
 	import { fly } from 'svelte/transition';
 
@@ -26,7 +26,7 @@
 	};
 </script>
 
-<header class="h-14 relative border-b-[1px] border-base bg-muted backdrop-blur-lg">
+<header class="h-14 relative border-b-[1px] border-base bg-dominant backdrop-blur-lg">
 	<button
 		class="lg:hidden absolute top-1/2 -translate-y-1/2 left-3 nav-btn text-accent"
 		id="nav-btn"
@@ -50,7 +50,12 @@
 			transition:fly={{ y: -300, duration: 300 }}
 		>
 			<SearchSVG />
-			<input type="text" class="grow bg-transparent p-2 focus:outline-none" placeholder="Search" />
+			<input
+				type="text"
+				class="grow bg-transparent p-2 focus:outline-none"
+				placeholder="Search"
+				bind:value={$search}
+			/>
 			<div class="flex text-sm items-center pr-2 gap-1">
 				<span class="border-[1px] border-base rounded w-6 h-6 flex items-center justify-center">
 					<Command />

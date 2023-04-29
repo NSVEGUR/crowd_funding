@@ -1,6 +1,5 @@
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { handleAuthRedirect } from '$lib/utils/redirect';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.session) {
@@ -9,8 +8,7 @@ export const load: PageServerLoad = async ({ locals }) => {
 };
 
 export const actions: Actions = {
-	signup: async function (event) {
-		const { request, locals } = event;
+	signup: async function ({ request, locals }) {
 		const body = Object.fromEntries(await request.formData());
 		if (body.password.length < 6) {
 			return fail(500, {
@@ -31,9 +29,27 @@ export const actions: Actions = {
 				error: 'Server error. Please try again later'
 			});
 		}
-		throw redirect(302, handleAuthRedirect(event, 'success', 'Please confirm your mail to login'));
+		throw redirect(302, '/personal');
 	},
-	login: async function ({ request, locals }) {
+	login: async function ({ request, locals, url }) {
+		const provider = url.searchParams.get('provider');
+		if (provider) {
+			if (provider != 'google') {
+				return fail(400, {
+					error: 'Provider not supported'
+				});
+			}
+			const { data, error: err } = await locals.supabase.auth.signInWithOAuth({
+				provider: provider
+			});
+			if (err) {
+				return fail(400, {
+					error: 'Something went wrong'
+				});
+			}
+
+			throw redirect(302, data.url);
+		}
 		const body = Object.fromEntries(await request.formData());
 		const { error: err } = await locals.supabase.auth.signInWithPassword({
 			email: body.email as string,

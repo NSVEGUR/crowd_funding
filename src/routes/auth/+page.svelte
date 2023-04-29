@@ -74,14 +74,11 @@
 			>Login</button
 		>
 		<div class="flex justify-evenly gap-5 min-w-[30%]">
-			<button class="p-2 border-[1px] border-base w-full rounded-lg">
-				<i class="fab fa-google" />
-			</button>
-			<button class="p-2 border-[1px] border-base w-full rounded-lg">
-				<i class="fab fa-github" />
-			</button>
-			<button class="p-2 border-[1px] border-base w-full rounded-lg">
-				<i class="fab fa-discord" />
+			<button
+				class="p-2 border-[1px] border-base w-full rounded-lg"
+				formaction="?/login&provider=google"
+			>
+				<span class="text-skin-muted mr-3">Continue with google</span><i class="fab fa-google" />
 			</button>
 		</div>
 		<div class="text-skin-muted">
@@ -149,14 +146,11 @@
 			>Signup</button
 		>
 		<div class="flex justify-evenly gap-5 min-w-[30%]">
-			<button class="p-2 border-[1px] border-base w-full rounded-lg">
-				<i class="fab fa-google" />
-			</button>
-			<button class="p-2 border-[1px] border-base w-full rounded-lg">
-				<i class="fab fa-github" />
-			</button>
-			<button class="p-2 border-[1px] border-base w-full rounded-lg">
-				<i class="fab fa-discord" />
+			<button
+				class="p-2 border-[1px] border-base w-full rounded-lg"
+				formaction="?/login&provider=google"
+			>
+				<span class="text-skin-muted mr-3">Continue with google</span><i class="fab fa-google" />
 			</button>
 		</div>
 		<div class="text-skin-muted">

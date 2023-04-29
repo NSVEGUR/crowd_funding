@@ -1,17 +1,43 @@
 <script lang="ts">
 	import type { PageData } from './$types';
-	import CampaignCard from '$lib/components/CampaignCard.svelte';
+	import CampaignList from '$lib/components/CampaignList.svelte';
 	export let data: PageData;
+	import { createSearchStore, search, searchHandler } from '$lib/stores';
+	import { onDestroy } from 'svelte';
+
+	$: searchCampaigns = data.campaigns.map((campaign) => {
+		return {
+			...campaign,
+			searchTerms: `${campaign.type} ${campaign.title} ${campaign.story} ${campaign.othersType} ${campaign.user.email}`
+		};
+	});
+	$: campaigns = createSearchStore(searchCampaigns);
+	$: $campaigns.search = $search;
+	$: unsubscribe = campaigns.subscribe((model) => searchHandler(model));
+
+	$: education = $campaigns.filtered.filter((campaign) => campaign.type == 'Education');
+	$: ngo = $campaigns.filtered.filter((campaign) => campaign.type == 'NGO');
+	$: personal = $campaigns.filtered.filter((campaign) => campaign.type == 'Personal');
+	$: others = $campaigns.filtered.filter((campaign) => campaign.type == 'Others');
+	onDestroy(() => {
+		unsubscribe();
+	});
 </script>
 
 <section>
 	{#if data.campaigns && data.campaigns.length > 0}
-		<h1 class="font-medium text-2xl mb-5">All Campaigns ({data.campaigns.length})</h1>
-		<div class="grid pb-10 grid-cols-4 gap-14 items-start -lg:grid-cols-1 -md:gap-10">
-			{#each data.campaigns as campaign}
-				<CampaignCard {campaign} />
-			{/each}
-		</div>
+		{#if education.length > 0}
+			<CampaignList campaigns={education} type="Education" />
+		{/if}
+		{#if ngo.length > 0}
+			<CampaignList campaigns={ngo} type="NGO" />
+		{/if}
+		{#if personal.length > 0}
+			<CampaignList campaigns={personal} type="Personal" />
+		{/if}
+		{#if others.length > 0}
+			<CampaignList campaigns={others} type="Others" />
+		{/if}
 	{:else}
 		<div class="text-skin-muted">No Campaigns</div>
 	{/if}

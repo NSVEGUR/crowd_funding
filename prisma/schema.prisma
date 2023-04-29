@@ -20,11 +20,19 @@ enum Role {
   USER
 }
 
+enum CampaignType {
+  Personal
+  NGO
+  Education
+  Others
+}
+
 model User{
   id String @id @default(uuid())
   email String @unique
+  name String?
   role Role @default(USER)
-  customerId String? @unique
+  stripeUser StripeUser?
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
   campaigns Campaign[]
@@ -33,15 +41,39 @@ model User{
 
 model Campaign{
   id String @id @default(uuid())
+  userName String @default("Anonymous")
   userId String
   user User @relation(fields: [userId], references: [id])
   title String
   story String
   target Float
+  type CampaignType
+  othersType String?
   image String
   endDate DateTime
   amountCollected Float @default(0)
-  donators String[]
-  donations Float[]
+  donations Donation[]
   @@map("campaigns")
+}
+
+model Donation{
+  id String @id @default(uuid())
+  userId String
+  user StripeUser @relation(fields: [userId], references: [id])
+  campaignId String
+  campaign Campaign @relation(fields: [campaignId], references: [id])
+  amount Float
+  anonymous Boolean @default(false)
+  @@map("donations")
+}
+
+model StripeUser{
+  id String @id @default(uuid())
+  email String @unique
+  name String?
+  phone String?
+  donations Donation[]
+  userId String?@unique
+  user User?@relation(fields: [userId], references: [id])
+  @@map("stripe_users")
 }

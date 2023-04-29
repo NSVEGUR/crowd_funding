@@ -26,7 +26,8 @@ const config = {
 				base: '#DFDFE1'
 			},
 			backgroundImage: {
-				'gradient-dominant': `linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);`
+				'gradient-dominant': `linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);`,
+				'gradient-profile': `linear-gradient(to right, #868f96 0%, #596164 100%);`
 			},
 			screens: {
 				'-2xl': { max: '1535px' },
