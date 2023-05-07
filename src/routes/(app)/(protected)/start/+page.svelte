@@ -1,15 +1,27 @@
 <script lang="ts">
 	import { enhance, applyAction } from '$app/forms';
 	import { snackbar } from '$lib/stores/snackbar';
-	import { invalidateAll } from '$app/navigation';
 	import type { ActionData } from './$types';
-	import { redirect } from '@sveltejs/kit';
 	export let form: ActionData;
 
 	let type = 'Personal';
+	let imgUrl: string | undefined = undefined;
+
+	const updateImage = () => {
+		const fileObj = document.getElementById('file') as any;
+		if (FileReader && fileObj && fileObj.files) {
+			const fr = new FileReader();
+			fr.addEventListener('load', () => {
+				imgUrl = fr.result as string;
+			});
+			fr.readAsDataURL(fileObj.files[0]);
+		} else {
+			console.error('File reader is not supported');
+		}
+	};
 </script>
 
-<section class="w-full h-full pb-10 relative z-10">
+<section class="w-full h-full mb-20 relative z-10">
 	<div class="flex w-full items-center justify-center">
 		<h1 class="text-center text-skin-base font-bold text-4xl">Start a Campaign</h1>
 	</div>
@@ -105,16 +117,38 @@
 				/>
 			</div>
 		</div>
-		<div class="flex flex-col gap-2 w-full items-center justify-center">
+		<div class="flex flex-col gap-2 w-full items-start justify-center">
 			<label for="image" class="self-start text-skin-muted">Campaign image*</label>
-			<input
-				type="file"
-				name="file"
-				required
-				accept="image/*"
-				class="w-full bg-domniant focus:outline-none border-[1px] border-base rounded-lg p-5"
-				placeholder="Image URL of your campaign"
-			/>
+			<div class="flex gap-3 w-full">
+				{#if imgUrl}
+					<div class="w-full flex-grow">
+						<img
+							class="w-full h-96 object-cover rounded-lg"
+							src={imgUrl}
+							alt="campaignImage"
+							id="campaign-image"
+						/>
+					</div>
+				{/if}
+				<label
+					for="file"
+					class="border-[1px] border-base bg-dominant rounded-lg p-2 cursor-pointer h-max text-skin-muted"
+					><input
+						type="file"
+						name="file"
+						id="file"
+						required
+						hidden
+						accept=".png,.jpeg,.jpg,.svg"
+						placeholder="Image URL of your campaign"
+						on:change={updateImage}
+					/>{#if imgUrl}
+						<span>Edit</span>
+					{:else}
+						<span>Choose Image</span>
+					{/if}
+				</label>
+			</div>
 		</div>
 		{#if form?.error}
 			<p class="text-skin-error text-center">{form.error}</p>

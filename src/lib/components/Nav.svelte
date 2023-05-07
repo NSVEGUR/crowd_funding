@@ -90,7 +90,9 @@
 			{/each}
 		</ul>
 	</nav>
-	<section class="p-10 h-screen w-full overflow-scroll -sm:p-3">
-		<slot><!-- optional fallback --></slot>
+	<section class="p-10 h-screen w-full overflow-scroll -sm:p-3 flex justify-center">
+		<div class="w-[80%] -xl:w-[90%] -lg:w-[95%] -sm:w-full h-full">
+			<slot><!-- optional fallback --></slot>
+		</div>
 	</section>
 </section>

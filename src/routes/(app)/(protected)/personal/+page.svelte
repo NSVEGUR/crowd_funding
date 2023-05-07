@@ -27,16 +27,16 @@
 <section>
 	{#if data.campaigns && data.campaigns.length > 0}
 		{#if education.length > 0}
-			<CampaignList campaigns={education} type="Education" />
+			<CampaignList campaigns={education} type="Education" campaignType="Personal" />
 		{/if}
 		{#if ngo.length > 0}
-			<CampaignList campaigns={ngo} type="NGO" />
+			<CampaignList campaigns={ngo} type="NGO" campaignType="Personal" />
 		{/if}
 		{#if personal.length > 0}
-			<CampaignList campaigns={personal} type="Personal" />
+			<CampaignList campaigns={personal} type="Personal" campaignType="Personal" />
 		{/if}
 		{#if others.length > 0}
-			<CampaignList campaigns={others} type="Others" />
+			<CampaignList campaigns={others} type="Others" campaignType="Personal" />
 		{/if}
 	{:else}
 		<div class="text-skin-muted">No Campaigns</div>

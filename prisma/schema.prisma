@@ -53,6 +53,7 @@ model Campaign{
   endDate DateTime
   amountCollected Float @default(0)
   donations Donation[]
+  withdrawalRequests WithdrawalRequest[]
   @@map("campaigns")
 }
 
@@ -76,4 +77,12 @@ model StripeUser{
   userId String?@unique
   user User?@relation(fields: [userId], references: [id])
   @@map("stripe_users")
+}
+
+model WithdrawalRequest{
+  id String @id @default(uuid())
+  campaignId String
+  campaign Campaign @relation(fields: [campaignId], references: [id])
+  amount Float
+  @@map("withdrawal_requests")
 }

@@ -31,7 +31,7 @@
 			active: false
 		}
 	];
-	let imageUrl: string | null = null;
+	let imgUrl: string | null = null;
 	let amount = 0;
 	const downloadImage = async (path: string) => {
 		try {
@@ -41,7 +41,7 @@
 				throw error;
 			}
 			const url = URL.createObjectURL(data);
-			imageUrl = url;
+			imgUrl = url;
 		} catch (error) {
 			if (error instanceof Error) {
 				console.log('Error downloading image: ', error.message);
@@ -87,6 +87,7 @@
 			toggleDonate = false;
 		}
 	};
+
 	const sharable = {
 		url: $page.url.href,
 		title: 'Crowd Funding',
@@ -94,16 +95,16 @@
 	};
 </script>
 
-<section class="w-full h-full pb-10 overflow-scroll">
+<section class="w-full h-full mb-20">
 	<h1 class="text-center text-5xl font-bold mb-5">
 		{campaign.title} ({campaign.type === 'Others' ? campaign.othersType : campaign.type})
 	</h1>
-	<div class="flex gap-3 w-full items-start -md:flex-col">
+	<div class="flex gap-2 w-full items-start -md:flex-col -md:mb-24">
 		<div class="w-[70%] -lg:w-[60%] -md:w-full">
 			<div class="relative rounded-lg group overflow-hidden">
-				{#if imageUrl}
+				{#if imgUrl}
 					<img
-						src={imageUrl}
+						src={imgUrl}
 						alt={campaign.title}
 						class="w-full h-96 object-cover group-hover:scale-150 transition-all duration-500"
 					/>
@@ -151,7 +152,7 @@
 							</div>
 						</div>
 					</div>
-					<div>
+					<div class="-md:hidden">
 						<h1 class="text-3xl font-medium my-2">About Campaign</h1>
 						<p class="text-skin-muted text-justify">{data.campaign.story}</p>
 					</div>
@@ -159,110 +160,114 @@
 			</div>
 		</div>
 		<div class="w-[30%] -lg:w-[40%] -md:w-full flex flex-col gap-3">
-			<div class="flex justify-evenly">
-				{#each donationSuggestions as { amount: donation, active }, index}
-					<button
-						class="border-[1px] border-accent p-1 rounded-lg text-center w-16 {active
-							? 'bg-accent'
-							: 'bg-transparent'}"
-						on:click={() => {
-							donationSuggestions.forEach((suggestion) => {
-								suggestion.active = false;
-							});
-							donationSuggestions[index].active = true;
-							const active = donationSuggestions.filter(
-								(suggestion) => suggestion.active == true
-							)[0];
-							if (active.amount === 'Others') {
-								amount = 10;
-							} else {
-								amount = parseFloat(active.amount);
-							}
-						}}
-					>
-						{#if donation === 'Others'}
-							{donation}
-						{:else}
-							{donation} &#36;
-						{/if}
-					</button>
-				{/each}
-			</div>
-			{#if donationSuggestions[3].active === true}
-				<input
-					type="number"
-					name="amount"
-					step="0.1"
-					placeholder="500 &#36;"
-					bind:value={amount}
-					class="bg-muted border-[1px] border-accent focus:outline-none p-3 rounded-lg"
-				/>
-			{/if}
-			<form
-				class="flex flex-col gap-2"
-				action="?/donate"
-				method="POST"
-				use:enhance={({ data, cancel }) => {
-					if (!amount) {
-						snackbar.error('Please provide amount');
-						return cancel();
-					}
-					snackbar.promise('Redirecting to payment page...');
-					data.append('campaignId', `${campaign.id}`);
-					data.append('amount', `${amount}`);
-					data.append('anonymous', `${anonymous}`);
-					return async function ({ result }) {
-						snackbar.success('Redirected');
-						if (result.type == 'success') {
-							invalidateAll();
-						}
-						await applyAction(result);
-					};
-				}}
-			>
-				<div class="self-end">
-					<label for="anonymous" class="text-sm">Make my donation anonymous</label>
-					<input type="checkbox" id="anonymous" bind:checked={anonymous} />
+			<div class="flex flex-col gap-3 -md:hidden">
+				<div class="flex justify-evenly">
+					{#each donationSuggestions as { amount: donation, active }, index}
+						<button
+							class="border-[1px] border-accent p-1 rounded-lg text-center w-16 {active
+								? 'bg-accent'
+								: 'bg-transparent'}"
+							on:click={() => {
+								donationSuggestions.forEach((suggestion) => {
+									suggestion.active = false;
+								});
+								donationSuggestions[index].active = true;
+								const active = donationSuggestions.filter(
+									(suggestion) => suggestion.active == true
+								)[0];
+								if (active.amount === 'Others') {
+									amount = 10;
+								} else {
+									amount = parseFloat(active.amount);
+								}
+							}}
+						>
+							{#if donation === 'Others'}
+								{donation}
+							{:else}
+								{donation} &#36;
+							{/if}
+						</button>
+					{/each}
 				</div>
-				<button class="bg-accent rounded-lg p-3">
-					<i class="fas fa-heart" /> Donate
-				</button>
-			</form>
-			<button
-				class="rounded-lg border-[1px] border-accent p-3"
-				id="menu-share-btn"
-				on:click={() => {
-					toggleDonate = false;
-					toggleShare = true;
-				}}
-			>
-				<i class="fas fa-share-alt mr-2" /> Share
-			</button>
-			<div class="w-full text-right">
-				<h1 class="text-3xl font-bold">{campaign.amountCollected.toLocaleString('en-US')} &#36;</h1>
-				<h2 class="text-skin-muted text-lg">
-					raised of <span class="text-skin-base"
-						>{campaign.target.toLocaleString('en-US')} &#36;</span
-					> goal
-				</h2>
-				<div class="w-full border-[1px] border-accent h-3 rounded-lg mt-3 overflow-hidden">
-					<div
-						class="bg-accent h-full"
-						style="width: {(campaign.amountCollected / campaign.target) * 100}%;"
+				{#if donationSuggestions[3].active === true}
+					<input
+						type="number"
+						name="amount"
+						step="0.1"
+						placeholder="500 &#36;"
+						bind:value={amount}
+						class="bg-muted border-[1px] border-accent focus:outline-none p-3 rounded-lg"
 					/>
+				{/if}
+				<form
+					class="flex flex-col gap-2"
+					action="?/donate"
+					method="POST"
+					use:enhance={({ data, cancel }) => {
+						if (!amount) {
+							snackbar.error('Please provide amount');
+							return cancel();
+						}
+						snackbar.promise('Redirecting to payment page...');
+						data.append('campaignId', `${campaign.id}`);
+						data.append('amount', `${amount}`);
+						data.append('anonymous', `${anonymous}`);
+						return async function ({ result }) {
+							snackbar.success('Redirected');
+							if (result.type == 'success') {
+								invalidateAll();
+							}
+							await applyAction(result);
+						};
+					}}
+				>
+					<div class="self-end">
+						<label for="anonymous" class="text-sm">Make my donation anonymous</label>
+						<input type="checkbox" id="anonymous" bind:checked={anonymous} />
+					</div>
+					<button class="bg-accent rounded-lg p-3">
+						<i class="fas fa-heart" /> Donate
+					</button>
+				</form>
+				<button
+					class="rounded-lg border-[1px] border-accent p-3"
+					id="menu-share-btn"
+					on:click={() => {
+						toggleDonate = false;
+						toggleShare = true;
+					}}
+				>
+					<i class="fas fa-share-alt mr-2" /> Share
+				</button>
+				<div class="w-full text-right">
+					<h1 class="text-3xl font-bold">
+						{campaign.amountCollected.toLocaleString('en-US')} &#36;
+					</h1>
+					<h2 class="text-skin-muted text-lg">
+						raised of <span class="text-skin-base"
+							>{campaign.target.toLocaleString('en-US')} &#36;</span
+						> goal
+					</h2>
+					<div class="w-full border-[1px] border-accent h-3 rounded-lg mt-3 overflow-hidden">
+						<div
+							class="bg-accent h-full"
+							style="width: {(campaign.amountCollected / campaign.target) * 100}%;"
+						/>
+					</div>
 				</div>
-			</div>
-			<div class="flex justify-between">
-				<h2 class="text-2xl font-bold">
-					{campaign.donations.length}
-					<span class="text-skin-muted text-base font-normal">supporters</span>
-				</h2>
-				<h2 class="text-2xl font-bold">
-					{getDaysLeft(`${campaign.endDate}`)}
-					<span class="text-skin-muted text-base font-normal"
-						>{getDaysLeft(`${campaign.endDate}`) == 1 ? 'day' : 'days'} left</span
-					>
-				</h2>
+				<div class="flex justify-between">
+					<h2 class="text-2xl font-bold">
+						{campaign.donations.length}
+						<span class="text-skin-muted text-base font-normal">supporters</span>
+					</h2>
+					<h2 class="text-2xl font-bold">
+						{getDaysLeft(`${campaign.endDate}`)}
+						<span class="text-skin-muted text-base font-normal"
+							>{getDaysLeft(`${campaign.endDate}`) == 1 ? 'day' : 'days'} left</span
+						>
+					</h2>
+				</div>
 			</div>
 			<div class="border-[1px] border-base rounded-lg mt-5">
 				<h1
@@ -310,26 +315,24 @@
 			</div>
 		</div>
 	</div>
-	<div class="fixed bottom-5 right-5 flex flex-col gap-5 md:hidden">
+	<button
+		class="fixed bottom-20 right-5 md:hidden border-[1px] border-accent bg-muted text-accent text-xl rounded-full p-3 w-12 h-12 flex items-center justify-center"
+		id="menu-share-btn"
+		on:click={() => {
+			toggleDonate = false;
+			toggleShare = true;
+		}}
+	>
+		<i class="fas fa-share-alt" />
+	</button>
+	<div class="fixed bottom-0 left-0 w-full bg-dominant p-3 rounded-lg shadow-md md:hidden">
 		<button
-			class="bg-accent text-xl rounded-full p-3 w-12 h-12 flex items-center justify-center"
+			class="bg-accent text-skin-base p-3 w-full rounded-lg"
 			id="menu-donate-btn"
 			on:click={() => {
 				toggleDonate = true;
-			}}
+			}}><i class="fas fa-heart" /><span>Donate</span></button
 		>
-			<i class="fas fa-hand-holding-usd" />
-		</button>
-		<button
-			class="border-[1px] border-accent bg-muted text-accent text-xl rounded-full p-3 w-12 h-12 flex items-center justify-center"
-			id="menu-share-btn"
-			on:click={() => {
-				toggleDonate = false;
-				toggleShare = true;
-			}}
-		>
-			<i class="fas fa-share-alt" />
-		</button>
 	</div>
 </section>
 

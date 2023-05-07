@@ -24,6 +24,8 @@ export const TransactionIsolationLevelSchema = z.enum(['ReadUncommitted','ReadCo
 
 export const UserScalarFieldEnumSchema = z.enum(['id','email','name','role','createdAt','updatedAt']);
 
+export const WithdrawalRequestScalarFieldEnumSchema = z.enum(['id','campaignId','amount']);
+
 export const RoleSchema = z.enum(['ADMIN','USER']);
 
 export type RoleType = `${z.infer<typeof RoleSchema>}`
@@ -100,6 +102,18 @@ export const StripeUserSchema = z.object({
 export type StripeUser = z.infer<typeof StripeUserSchema>
 
 /////////////////////////////////////////
+// WITHDRAWAL REQUEST SCHEMA
+/////////////////////////////////////////
+
+export const WithdrawalRequestSchema = z.object({
+  id: z.string().uuid(),
+  campaignId: z.string(),
+  amount: z.number(),
+})
+
+export type WithdrawalRequest = z.infer<typeof WithdrawalRequestSchema>
+
+/////////////////////////////////////////
 // SELECT & INCLUDE
 /////////////////////////////////////////
 
@@ -143,6 +157,7 @@ export const UserSelectSchema: z.ZodType<Prisma.UserSelect> = z.object({
 export const CampaignIncludeSchema: z.ZodType<Prisma.CampaignInclude> = z.object({
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   donations: z.union([z.boolean(),z.lazy(() => DonationFindManyArgsSchema)]).optional(),
+  withdrawalRequests: z.union([z.boolean(),z.lazy(() => WithdrawalRequestFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => CampaignCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -157,6 +172,7 @@ export const CampaignCountOutputTypeArgsSchema: z.ZodType<Prisma.CampaignCountOu
 
 export const CampaignCountOutputTypeSelectSchema: z.ZodType<Prisma.CampaignCountOutputTypeSelect> = z.object({
   donations: z.boolean().optional(),
+  withdrawalRequests: z.boolean().optional(),
 }).strict();
 
 export const CampaignSelectSchema: z.ZodType<Prisma.CampaignSelect> = z.object({
@@ -173,6 +189,7 @@ export const CampaignSelectSchema: z.ZodType<Prisma.CampaignSelect> = z.object({
   amountCollected: z.boolean().optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   donations: z.union([z.boolean(),z.lazy(() => DonationFindManyArgsSchema)]).optional(),
+  withdrawalRequests: z.union([z.boolean(),z.lazy(() => WithdrawalRequestFindManyArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => CampaignCountOutputTypeArgsSchema)]).optional(),
 }).strict()
 
@@ -230,6 +247,25 @@ export const StripeUserSelectSchema: z.ZodType<Prisma.StripeUserSelect> = z.obje
   donations: z.union([z.boolean(),z.lazy(() => DonationFindManyArgsSchema)]).optional(),
   user: z.union([z.boolean(),z.lazy(() => UserArgsSchema)]).optional(),
   _count: z.union([z.boolean(),z.lazy(() => StripeUserCountOutputTypeArgsSchema)]).optional(),
+}).strict()
+
+// WITHDRAWAL REQUEST
+//------------------------------------------------------
+
+export const WithdrawalRequestIncludeSchema: z.ZodType<Prisma.WithdrawalRequestInclude> = z.object({
+  campaign: z.union([z.boolean(),z.lazy(() => CampaignArgsSchema)]).optional(),
+}).strict()
+
+export const WithdrawalRequestArgsSchema: z.ZodType<Prisma.WithdrawalRequestArgs> = z.object({
+  select: z.lazy(() => WithdrawalRequestSelectSchema).optional(),
+  include: z.lazy(() => WithdrawalRequestIncludeSchema).optional(),
+}).strict();
+
+export const WithdrawalRequestSelectSchema: z.ZodType<Prisma.WithdrawalRequestSelect> = z.object({
+  id: z.boolean().optional(),
+  campaignId: z.boolean().optional(),
+  amount: z.boolean().optional(),
+  campaign: z.union([z.boolean(),z.lazy(() => CampaignArgsSchema)]).optional(),
 }).strict()
 
 
@@ -307,7 +343,8 @@ export const CampaignWhereInputSchema: z.ZodType<Prisma.CampaignWhereInput> = z.
   endDate: z.union([ z.lazy(() => DateTimeFilterSchema),z.coerce.date() ]).optional(),
   amountCollected: z.union([ z.lazy(() => FloatFilterSchema),z.number() ]).optional(),
   user: z.union([ z.lazy(() => UserRelationFilterSchema),z.lazy(() => UserWhereInputSchema) ]).optional(),
-  donations: z.lazy(() => DonationListRelationFilterSchema).optional()
+  donations: z.lazy(() => DonationListRelationFilterSchema).optional(),
+  withdrawalRequests: z.lazy(() => WithdrawalRequestListRelationFilterSchema).optional()
 }).strict();
 
 export const CampaignOrderByWithRelationInputSchema: z.ZodType<Prisma.CampaignOrderByWithRelationInput> = z.object({
@@ -323,7 +360,8 @@ export const CampaignOrderByWithRelationInputSchema: z.ZodType<Prisma.CampaignOr
   endDate: z.lazy(() => SortOrderSchema).optional(),
   amountCollected: z.lazy(() => SortOrderSchema).optional(),
   user: z.lazy(() => UserOrderByWithRelationInputSchema).optional(),
-  donations: z.lazy(() => DonationOrderByRelationAggregateInputSchema).optional()
+  donations: z.lazy(() => DonationOrderByRelationAggregateInputSchema).optional(),
+  withdrawalRequests: z.lazy(() => WithdrawalRequestOrderByRelationAggregateInputSchema).optional()
 }).strict();
 
 export const CampaignWhereUniqueInputSchema: z.ZodType<Prisma.CampaignWhereUniqueInput> = z.object({
@@ -468,6 +506,47 @@ export const StripeUserScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.St
   userId: z.union([ z.lazy(() => StringNullableWithAggregatesFilterSchema),z.string() ]).optional().nullable(),
 }).strict();
 
+export const WithdrawalRequestWhereInputSchema: z.ZodType<Prisma.WithdrawalRequestWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => WithdrawalRequestWhereInputSchema),z.lazy(() => WithdrawalRequestWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => WithdrawalRequestWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => WithdrawalRequestWhereInputSchema),z.lazy(() => WithdrawalRequestWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  campaignId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  amount: z.union([ z.lazy(() => FloatFilterSchema),z.number() ]).optional(),
+  campaign: z.union([ z.lazy(() => CampaignRelationFilterSchema),z.lazy(() => CampaignWhereInputSchema) ]).optional(),
+}).strict();
+
+export const WithdrawalRequestOrderByWithRelationInputSchema: z.ZodType<Prisma.WithdrawalRequestOrderByWithRelationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  campaignId: z.lazy(() => SortOrderSchema).optional(),
+  amount: z.lazy(() => SortOrderSchema).optional(),
+  campaign: z.lazy(() => CampaignOrderByWithRelationInputSchema).optional()
+}).strict();
+
+export const WithdrawalRequestWhereUniqueInputSchema: z.ZodType<Prisma.WithdrawalRequestWhereUniqueInput> = z.object({
+  id: z.string().uuid().optional()
+}).strict();
+
+export const WithdrawalRequestOrderByWithAggregationInputSchema: z.ZodType<Prisma.WithdrawalRequestOrderByWithAggregationInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  campaignId: z.lazy(() => SortOrderSchema).optional(),
+  amount: z.lazy(() => SortOrderSchema).optional(),
+  _count: z.lazy(() => WithdrawalRequestCountOrderByAggregateInputSchema).optional(),
+  _avg: z.lazy(() => WithdrawalRequestAvgOrderByAggregateInputSchema).optional(),
+  _max: z.lazy(() => WithdrawalRequestMaxOrderByAggregateInputSchema).optional(),
+  _min: z.lazy(() => WithdrawalRequestMinOrderByAggregateInputSchema).optional(),
+  _sum: z.lazy(() => WithdrawalRequestSumOrderByAggregateInputSchema).optional()
+}).strict();
+
+export const WithdrawalRequestScalarWhereWithAggregatesInputSchema: z.ZodType<Prisma.WithdrawalRequestScalarWhereWithAggregatesInput> = z.object({
+  AND: z.union([ z.lazy(() => WithdrawalRequestScalarWhereWithAggregatesInputSchema),z.lazy(() => WithdrawalRequestScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  OR: z.lazy(() => WithdrawalRequestScalarWhereWithAggregatesInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => WithdrawalRequestScalarWhereWithAggregatesInputSchema),z.lazy(() => WithdrawalRequestScalarWhereWithAggregatesInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  campaignId: z.union([ z.lazy(() => StringWithAggregatesFilterSchema),z.string() ]).optional(),
+  amount: z.union([ z.lazy(() => FloatWithAggregatesFilterSchema),z.number() ]).optional(),
+}).strict();
+
 export const UserCreateInputSchema: z.ZodType<Prisma.UserCreateInput> = z.object({
   id: z.string().uuid().optional(),
   email: z.string(),
@@ -551,7 +630,8 @@ export const CampaignCreateInputSchema: z.ZodType<Prisma.CampaignCreateInput> = 
   endDate: z.coerce.date(),
   amountCollected: z.number().optional(),
   user: z.lazy(() => UserCreateNestedOneWithoutCampaignsInputSchema),
-  donations: z.lazy(() => DonationCreateNestedManyWithoutCampaignInputSchema).optional()
+  donations: z.lazy(() => DonationCreateNestedManyWithoutCampaignInputSchema).optional(),
+  withdrawalRequests: z.lazy(() => WithdrawalRequestCreateNestedManyWithoutCampaignInputSchema).optional()
 }).strict();
 
 export const CampaignUncheckedCreateInputSchema: z.ZodType<Prisma.CampaignUncheckedCreateInput> = z.object({
@@ -566,7 +646,8 @@ export const CampaignUncheckedCreateInputSchema: z.ZodType<Prisma.CampaignUnchec
   image: z.string(),
   endDate: z.coerce.date(),
   amountCollected: z.number().optional(),
-  donations: z.lazy(() => DonationUncheckedCreateNestedManyWithoutCampaignInputSchema).optional()
+  donations: z.lazy(() => DonationUncheckedCreateNestedManyWithoutCampaignInputSchema).optional(),
+  withdrawalRequests: z.lazy(() => WithdrawalRequestUncheckedCreateNestedManyWithoutCampaignInputSchema).optional()
 }).strict();
 
 export const CampaignUpdateInputSchema: z.ZodType<Prisma.CampaignUpdateInput> = z.object({
@@ -581,7 +662,8 @@ export const CampaignUpdateInputSchema: z.ZodType<Prisma.CampaignUpdateInput> = 
   endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   amountCollected: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
   user: z.lazy(() => UserUpdateOneRequiredWithoutCampaignsNestedInputSchema).optional(),
-  donations: z.lazy(() => DonationUpdateManyWithoutCampaignNestedInputSchema).optional()
+  donations: z.lazy(() => DonationUpdateManyWithoutCampaignNestedInputSchema).optional(),
+  withdrawalRequests: z.lazy(() => WithdrawalRequestUpdateManyWithoutCampaignNestedInputSchema).optional()
 }).strict();
 
 export const CampaignUncheckedUpdateInputSchema: z.ZodType<Prisma.CampaignUncheckedUpdateInput> = z.object({
@@ -596,7 +678,8 @@ export const CampaignUncheckedUpdateInputSchema: z.ZodType<Prisma.CampaignUnchec
   image: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   amountCollected: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  donations: z.lazy(() => DonationUncheckedUpdateManyWithoutCampaignNestedInputSchema).optional()
+  donations: z.lazy(() => DonationUncheckedUpdateManyWithoutCampaignNestedInputSchema).optional(),
+  withdrawalRequests: z.lazy(() => WithdrawalRequestUncheckedUpdateManyWithoutCampaignNestedInputSchema).optional()
 }).strict();
 
 export const CampaignCreateManyInputSchema: z.ZodType<Prisma.CampaignCreateManyInput> = z.object({
@@ -751,6 +834,47 @@ export const StripeUserUncheckedUpdateManyInputSchema: z.ZodType<Prisma.StripeUs
   name: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   phone: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
   userId: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+}).strict();
+
+export const WithdrawalRequestCreateInputSchema: z.ZodType<Prisma.WithdrawalRequestCreateInput> = z.object({
+  id: z.string().uuid().optional(),
+  amount: z.number(),
+  campaign: z.lazy(() => CampaignCreateNestedOneWithoutWithdrawalRequestsInputSchema)
+}).strict();
+
+export const WithdrawalRequestUncheckedCreateInputSchema: z.ZodType<Prisma.WithdrawalRequestUncheckedCreateInput> = z.object({
+  id: z.string().uuid().optional(),
+  campaignId: z.string(),
+  amount: z.number()
+}).strict();
+
+export const WithdrawalRequestUpdateInputSchema: z.ZodType<Prisma.WithdrawalRequestUpdateInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  amount: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  campaign: z.lazy(() => CampaignUpdateOneRequiredWithoutWithdrawalRequestsNestedInputSchema).optional()
+}).strict();
+
+export const WithdrawalRequestUncheckedUpdateInputSchema: z.ZodType<Prisma.WithdrawalRequestUncheckedUpdateInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  campaignId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  amount: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const WithdrawalRequestCreateManyInputSchema: z.ZodType<Prisma.WithdrawalRequestCreateManyInput> = z.object({
+  id: z.string().uuid().optional(),
+  campaignId: z.string(),
+  amount: z.number()
+}).strict();
+
+export const WithdrawalRequestUpdateManyMutationInputSchema: z.ZodType<Prisma.WithdrawalRequestUpdateManyMutationInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  amount: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const WithdrawalRequestUncheckedUpdateManyInputSchema: z.ZodType<Prisma.WithdrawalRequestUncheckedUpdateManyInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  campaignId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  amount: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const StringFilterSchema: z.ZodType<Prisma.StringFilter> = z.object({
@@ -932,7 +1056,17 @@ export const DonationListRelationFilterSchema: z.ZodType<Prisma.DonationListRela
   none: z.lazy(() => DonationWhereInputSchema).optional()
 }).strict();
 
+export const WithdrawalRequestListRelationFilterSchema: z.ZodType<Prisma.WithdrawalRequestListRelationFilter> = z.object({
+  every: z.lazy(() => WithdrawalRequestWhereInputSchema).optional(),
+  some: z.lazy(() => WithdrawalRequestWhereInputSchema).optional(),
+  none: z.lazy(() => WithdrawalRequestWhereInputSchema).optional()
+}).strict();
+
 export const DonationOrderByRelationAggregateInputSchema: z.ZodType<Prisma.DonationOrderByRelationAggregateInput> = z.object({
+  _count: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const WithdrawalRequestOrderByRelationAggregateInputSchema: z.ZodType<Prisma.WithdrawalRequestOrderByRelationAggregateInput> = z.object({
   _count: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
@@ -1088,6 +1222,32 @@ export const StripeUserMinOrderByAggregateInputSchema: z.ZodType<Prisma.StripeUs
   userId: z.lazy(() => SortOrderSchema).optional()
 }).strict();
 
+export const WithdrawalRequestCountOrderByAggregateInputSchema: z.ZodType<Prisma.WithdrawalRequestCountOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  campaignId: z.lazy(() => SortOrderSchema).optional(),
+  amount: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const WithdrawalRequestAvgOrderByAggregateInputSchema: z.ZodType<Prisma.WithdrawalRequestAvgOrderByAggregateInput> = z.object({
+  amount: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const WithdrawalRequestMaxOrderByAggregateInputSchema: z.ZodType<Prisma.WithdrawalRequestMaxOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  campaignId: z.lazy(() => SortOrderSchema).optional(),
+  amount: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const WithdrawalRequestMinOrderByAggregateInputSchema: z.ZodType<Prisma.WithdrawalRequestMinOrderByAggregateInput> = z.object({
+  id: z.lazy(() => SortOrderSchema).optional(),
+  campaignId: z.lazy(() => SortOrderSchema).optional(),
+  amount: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
+export const WithdrawalRequestSumOrderByAggregateInputSchema: z.ZodType<Prisma.WithdrawalRequestSumOrderByAggregateInput> = z.object({
+  amount: z.lazy(() => SortOrderSchema).optional()
+}).strict();
+
 export const StripeUserCreateNestedOneWithoutUserInputSchema: z.ZodType<Prisma.StripeUserCreateNestedOneWithoutUserInput> = z.object({
   create: z.union([ z.lazy(() => StripeUserCreateWithoutUserInputSchema),z.lazy(() => StripeUserUncheckedCreateWithoutUserInputSchema) ]).optional(),
   connectOrCreate: z.lazy(() => StripeUserCreateOrConnectWithoutUserInputSchema).optional(),
@@ -1191,11 +1351,25 @@ export const DonationCreateNestedManyWithoutCampaignInputSchema: z.ZodType<Prism
   connect: z.union([ z.lazy(() => DonationWhereUniqueInputSchema),z.lazy(() => DonationWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
+export const WithdrawalRequestCreateNestedManyWithoutCampaignInputSchema: z.ZodType<Prisma.WithdrawalRequestCreateNestedManyWithoutCampaignInput> = z.object({
+  create: z.union([ z.lazy(() => WithdrawalRequestCreateWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestCreateWithoutCampaignInputSchema).array(),z.lazy(() => WithdrawalRequestUncheckedCreateWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestUncheckedCreateWithoutCampaignInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => WithdrawalRequestCreateOrConnectWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestCreateOrConnectWithoutCampaignInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => WithdrawalRequestCreateManyCampaignInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => WithdrawalRequestWhereUniqueInputSchema),z.lazy(() => WithdrawalRequestWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
 export const DonationUncheckedCreateNestedManyWithoutCampaignInputSchema: z.ZodType<Prisma.DonationUncheckedCreateNestedManyWithoutCampaignInput> = z.object({
   create: z.union([ z.lazy(() => DonationCreateWithoutCampaignInputSchema),z.lazy(() => DonationCreateWithoutCampaignInputSchema).array(),z.lazy(() => DonationUncheckedCreateWithoutCampaignInputSchema),z.lazy(() => DonationUncheckedCreateWithoutCampaignInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => DonationCreateOrConnectWithoutCampaignInputSchema),z.lazy(() => DonationCreateOrConnectWithoutCampaignInputSchema).array() ]).optional(),
   createMany: z.lazy(() => DonationCreateManyCampaignInputEnvelopeSchema).optional(),
   connect: z.union([ z.lazy(() => DonationWhereUniqueInputSchema),z.lazy(() => DonationWhereUniqueInputSchema).array() ]).optional(),
+}).strict();
+
+export const WithdrawalRequestUncheckedCreateNestedManyWithoutCampaignInputSchema: z.ZodType<Prisma.WithdrawalRequestUncheckedCreateNestedManyWithoutCampaignInput> = z.object({
+  create: z.union([ z.lazy(() => WithdrawalRequestCreateWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestCreateWithoutCampaignInputSchema).array(),z.lazy(() => WithdrawalRequestUncheckedCreateWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestUncheckedCreateWithoutCampaignInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => WithdrawalRequestCreateOrConnectWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestCreateOrConnectWithoutCampaignInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => WithdrawalRequestCreateManyCampaignInputEnvelopeSchema).optional(),
+  connect: z.union([ z.lazy(() => WithdrawalRequestWhereUniqueInputSchema),z.lazy(() => WithdrawalRequestWhereUniqueInputSchema).array() ]).optional(),
 }).strict();
 
 export const FloatFieldUpdateOperationsInputSchema: z.ZodType<Prisma.FloatFieldUpdateOperationsInput> = z.object({
@@ -1232,6 +1406,20 @@ export const DonationUpdateManyWithoutCampaignNestedInputSchema: z.ZodType<Prism
   deleteMany: z.union([ z.lazy(() => DonationScalarWhereInputSchema),z.lazy(() => DonationScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
+export const WithdrawalRequestUpdateManyWithoutCampaignNestedInputSchema: z.ZodType<Prisma.WithdrawalRequestUpdateManyWithoutCampaignNestedInput> = z.object({
+  create: z.union([ z.lazy(() => WithdrawalRequestCreateWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestCreateWithoutCampaignInputSchema).array(),z.lazy(() => WithdrawalRequestUncheckedCreateWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestUncheckedCreateWithoutCampaignInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => WithdrawalRequestCreateOrConnectWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestCreateOrConnectWithoutCampaignInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => WithdrawalRequestUpsertWithWhereUniqueWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestUpsertWithWhereUniqueWithoutCampaignInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => WithdrawalRequestCreateManyCampaignInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => WithdrawalRequestWhereUniqueInputSchema),z.lazy(() => WithdrawalRequestWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => WithdrawalRequestWhereUniqueInputSchema),z.lazy(() => WithdrawalRequestWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => WithdrawalRequestWhereUniqueInputSchema),z.lazy(() => WithdrawalRequestWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => WithdrawalRequestWhereUniqueInputSchema),z.lazy(() => WithdrawalRequestWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => WithdrawalRequestUpdateWithWhereUniqueWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestUpdateWithWhereUniqueWithoutCampaignInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => WithdrawalRequestUpdateManyWithWhereWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestUpdateManyWithWhereWithoutCampaignInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => WithdrawalRequestScalarWhereInputSchema),z.lazy(() => WithdrawalRequestScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
 export const DonationUncheckedUpdateManyWithoutCampaignNestedInputSchema: z.ZodType<Prisma.DonationUncheckedUpdateManyWithoutCampaignNestedInput> = z.object({
   create: z.union([ z.lazy(() => DonationCreateWithoutCampaignInputSchema),z.lazy(() => DonationCreateWithoutCampaignInputSchema).array(),z.lazy(() => DonationUncheckedCreateWithoutCampaignInputSchema),z.lazy(() => DonationUncheckedCreateWithoutCampaignInputSchema).array() ]).optional(),
   connectOrCreate: z.union([ z.lazy(() => DonationCreateOrConnectWithoutCampaignInputSchema),z.lazy(() => DonationCreateOrConnectWithoutCampaignInputSchema).array() ]).optional(),
@@ -1244,6 +1432,20 @@ export const DonationUncheckedUpdateManyWithoutCampaignNestedInputSchema: z.ZodT
   update: z.union([ z.lazy(() => DonationUpdateWithWhereUniqueWithoutCampaignInputSchema),z.lazy(() => DonationUpdateWithWhereUniqueWithoutCampaignInputSchema).array() ]).optional(),
   updateMany: z.union([ z.lazy(() => DonationUpdateManyWithWhereWithoutCampaignInputSchema),z.lazy(() => DonationUpdateManyWithWhereWithoutCampaignInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => DonationScalarWhereInputSchema),z.lazy(() => DonationScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const WithdrawalRequestUncheckedUpdateManyWithoutCampaignNestedInputSchema: z.ZodType<Prisma.WithdrawalRequestUncheckedUpdateManyWithoutCampaignNestedInput> = z.object({
+  create: z.union([ z.lazy(() => WithdrawalRequestCreateWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestCreateWithoutCampaignInputSchema).array(),z.lazy(() => WithdrawalRequestUncheckedCreateWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestUncheckedCreateWithoutCampaignInputSchema).array() ]).optional(),
+  connectOrCreate: z.union([ z.lazy(() => WithdrawalRequestCreateOrConnectWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestCreateOrConnectWithoutCampaignInputSchema).array() ]).optional(),
+  upsert: z.union([ z.lazy(() => WithdrawalRequestUpsertWithWhereUniqueWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestUpsertWithWhereUniqueWithoutCampaignInputSchema).array() ]).optional(),
+  createMany: z.lazy(() => WithdrawalRequestCreateManyCampaignInputEnvelopeSchema).optional(),
+  set: z.union([ z.lazy(() => WithdrawalRequestWhereUniqueInputSchema),z.lazy(() => WithdrawalRequestWhereUniqueInputSchema).array() ]).optional(),
+  disconnect: z.union([ z.lazy(() => WithdrawalRequestWhereUniqueInputSchema),z.lazy(() => WithdrawalRequestWhereUniqueInputSchema).array() ]).optional(),
+  delete: z.union([ z.lazy(() => WithdrawalRequestWhereUniqueInputSchema),z.lazy(() => WithdrawalRequestWhereUniqueInputSchema).array() ]).optional(),
+  connect: z.union([ z.lazy(() => WithdrawalRequestWhereUniqueInputSchema),z.lazy(() => WithdrawalRequestWhereUniqueInputSchema).array() ]).optional(),
+  update: z.union([ z.lazy(() => WithdrawalRequestUpdateWithWhereUniqueWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestUpdateWithWhereUniqueWithoutCampaignInputSchema).array() ]).optional(),
+  updateMany: z.union([ z.lazy(() => WithdrawalRequestUpdateManyWithWhereWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestUpdateManyWithWhereWithoutCampaignInputSchema).array() ]).optional(),
+  deleteMany: z.union([ z.lazy(() => WithdrawalRequestScalarWhereInputSchema),z.lazy(() => WithdrawalRequestScalarWhereInputSchema).array() ]).optional(),
 }).strict();
 
 export const StripeUserCreateNestedOneWithoutDonationsInputSchema: z.ZodType<Prisma.StripeUserCreateNestedOneWithoutDonationsInput> = z.object({
@@ -1334,6 +1536,20 @@ export const DonationUncheckedUpdateManyWithoutUserNestedInputSchema: z.ZodType<
   update: z.union([ z.lazy(() => DonationUpdateWithWhereUniqueWithoutUserInputSchema),z.lazy(() => DonationUpdateWithWhereUniqueWithoutUserInputSchema).array() ]).optional(),
   updateMany: z.union([ z.lazy(() => DonationUpdateManyWithWhereWithoutUserInputSchema),z.lazy(() => DonationUpdateManyWithWhereWithoutUserInputSchema).array() ]).optional(),
   deleteMany: z.union([ z.lazy(() => DonationScalarWhereInputSchema),z.lazy(() => DonationScalarWhereInputSchema).array() ]).optional(),
+}).strict();
+
+export const CampaignCreateNestedOneWithoutWithdrawalRequestsInputSchema: z.ZodType<Prisma.CampaignCreateNestedOneWithoutWithdrawalRequestsInput> = z.object({
+  create: z.union([ z.lazy(() => CampaignCreateWithoutWithdrawalRequestsInputSchema),z.lazy(() => CampaignUncheckedCreateWithoutWithdrawalRequestsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => CampaignCreateOrConnectWithoutWithdrawalRequestsInputSchema).optional(),
+  connect: z.lazy(() => CampaignWhereUniqueInputSchema).optional()
+}).strict();
+
+export const CampaignUpdateOneRequiredWithoutWithdrawalRequestsNestedInputSchema: z.ZodType<Prisma.CampaignUpdateOneRequiredWithoutWithdrawalRequestsNestedInput> = z.object({
+  create: z.union([ z.lazy(() => CampaignCreateWithoutWithdrawalRequestsInputSchema),z.lazy(() => CampaignUncheckedCreateWithoutWithdrawalRequestsInputSchema) ]).optional(),
+  connectOrCreate: z.lazy(() => CampaignCreateOrConnectWithoutWithdrawalRequestsInputSchema).optional(),
+  upsert: z.lazy(() => CampaignUpsertWithoutWithdrawalRequestsInputSchema).optional(),
+  connect: z.lazy(() => CampaignWhereUniqueInputSchema).optional(),
+  update: z.union([ z.lazy(() => CampaignUpdateWithoutWithdrawalRequestsInputSchema),z.lazy(() => CampaignUncheckedUpdateWithoutWithdrawalRequestsInputSchema) ]).optional(),
 }).strict();
 
 export const NestedStringFilterSchema: z.ZodType<Prisma.NestedStringFilter> = z.object({
@@ -1551,7 +1767,8 @@ export const CampaignCreateWithoutUserInputSchema: z.ZodType<Prisma.CampaignCrea
   image: z.string(),
   endDate: z.coerce.date(),
   amountCollected: z.number().optional(),
-  donations: z.lazy(() => DonationCreateNestedManyWithoutCampaignInputSchema).optional()
+  donations: z.lazy(() => DonationCreateNestedManyWithoutCampaignInputSchema).optional(),
+  withdrawalRequests: z.lazy(() => WithdrawalRequestCreateNestedManyWithoutCampaignInputSchema).optional()
 }).strict();
 
 export const CampaignUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.CampaignUncheckedCreateWithoutUserInput> = z.object({
@@ -1565,7 +1782,8 @@ export const CampaignUncheckedCreateWithoutUserInputSchema: z.ZodType<Prisma.Cam
   image: z.string(),
   endDate: z.coerce.date(),
   amountCollected: z.number().optional(),
-  donations: z.lazy(() => DonationUncheckedCreateNestedManyWithoutCampaignInputSchema).optional()
+  donations: z.lazy(() => DonationUncheckedCreateNestedManyWithoutCampaignInputSchema).optional(),
+  withdrawalRequests: z.lazy(() => WithdrawalRequestUncheckedCreateNestedManyWithoutCampaignInputSchema).optional()
 }).strict();
 
 export const CampaignCreateOrConnectWithoutUserInputSchema: z.ZodType<Prisma.CampaignCreateOrConnectWithoutUserInput> = z.object({
@@ -1681,6 +1899,26 @@ export const DonationCreateManyCampaignInputEnvelopeSchema: z.ZodType<Prisma.Don
   skipDuplicates: z.boolean().optional()
 }).strict();
 
+export const WithdrawalRequestCreateWithoutCampaignInputSchema: z.ZodType<Prisma.WithdrawalRequestCreateWithoutCampaignInput> = z.object({
+  id: z.string().optional(),
+  amount: z.number()
+}).strict();
+
+export const WithdrawalRequestUncheckedCreateWithoutCampaignInputSchema: z.ZodType<Prisma.WithdrawalRequestUncheckedCreateWithoutCampaignInput> = z.object({
+  id: z.string().optional(),
+  amount: z.number()
+}).strict();
+
+export const WithdrawalRequestCreateOrConnectWithoutCampaignInputSchema: z.ZodType<Prisma.WithdrawalRequestCreateOrConnectWithoutCampaignInput> = z.object({
+  where: z.lazy(() => WithdrawalRequestWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => WithdrawalRequestCreateWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestUncheckedCreateWithoutCampaignInputSchema) ]),
+}).strict();
+
+export const WithdrawalRequestCreateManyCampaignInputEnvelopeSchema: z.ZodType<Prisma.WithdrawalRequestCreateManyCampaignInputEnvelope> = z.object({
+  data: z.union([ z.lazy(() => WithdrawalRequestCreateManyCampaignInputSchema),z.lazy(() => WithdrawalRequestCreateManyCampaignInputSchema).array() ]),
+  skipDuplicates: z.boolean().optional()
+}).strict();
+
 export const UserUpsertWithoutCampaignsInputSchema: z.ZodType<Prisma.UserUpsertWithoutCampaignsInput> = z.object({
   update: z.union([ z.lazy(() => UserUpdateWithoutCampaignsInputSchema),z.lazy(() => UserUncheckedUpdateWithoutCampaignsInputSchema) ]),
   create: z.union([ z.lazy(() => UserCreateWithoutCampaignsInputSchema),z.lazy(() => UserUncheckedCreateWithoutCampaignsInputSchema) ]),
@@ -1733,6 +1971,31 @@ export const DonationScalarWhereInputSchema: z.ZodType<Prisma.DonationScalarWher
   anonymous: z.union([ z.lazy(() => BoolFilterSchema),z.boolean() ]).optional(),
 }).strict();
 
+export const WithdrawalRequestUpsertWithWhereUniqueWithoutCampaignInputSchema: z.ZodType<Prisma.WithdrawalRequestUpsertWithWhereUniqueWithoutCampaignInput> = z.object({
+  where: z.lazy(() => WithdrawalRequestWhereUniqueInputSchema),
+  update: z.union([ z.lazy(() => WithdrawalRequestUpdateWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestUncheckedUpdateWithoutCampaignInputSchema) ]),
+  create: z.union([ z.lazy(() => WithdrawalRequestCreateWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestUncheckedCreateWithoutCampaignInputSchema) ]),
+}).strict();
+
+export const WithdrawalRequestUpdateWithWhereUniqueWithoutCampaignInputSchema: z.ZodType<Prisma.WithdrawalRequestUpdateWithWhereUniqueWithoutCampaignInput> = z.object({
+  where: z.lazy(() => WithdrawalRequestWhereUniqueInputSchema),
+  data: z.union([ z.lazy(() => WithdrawalRequestUpdateWithoutCampaignInputSchema),z.lazy(() => WithdrawalRequestUncheckedUpdateWithoutCampaignInputSchema) ]),
+}).strict();
+
+export const WithdrawalRequestUpdateManyWithWhereWithoutCampaignInputSchema: z.ZodType<Prisma.WithdrawalRequestUpdateManyWithWhereWithoutCampaignInput> = z.object({
+  where: z.lazy(() => WithdrawalRequestScalarWhereInputSchema),
+  data: z.union([ z.lazy(() => WithdrawalRequestUpdateManyMutationInputSchema),z.lazy(() => WithdrawalRequestUncheckedUpdateManyWithoutWithdrawalRequestsInputSchema) ]),
+}).strict();
+
+export const WithdrawalRequestScalarWhereInputSchema: z.ZodType<Prisma.WithdrawalRequestScalarWhereInput> = z.object({
+  AND: z.union([ z.lazy(() => WithdrawalRequestScalarWhereInputSchema),z.lazy(() => WithdrawalRequestScalarWhereInputSchema).array() ]).optional(),
+  OR: z.lazy(() => WithdrawalRequestScalarWhereInputSchema).array().optional(),
+  NOT: z.union([ z.lazy(() => WithdrawalRequestScalarWhereInputSchema),z.lazy(() => WithdrawalRequestScalarWhereInputSchema).array() ]).optional(),
+  id: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  campaignId: z.union([ z.lazy(() => StringFilterSchema),z.string() ]).optional(),
+  amount: z.union([ z.lazy(() => FloatFilterSchema),z.number() ]).optional(),
+}).strict();
+
 export const StripeUserCreateWithoutDonationsInputSchema: z.ZodType<Prisma.StripeUserCreateWithoutDonationsInput> = z.object({
   id: z.string().optional(),
   email: z.string(),
@@ -1765,7 +2028,8 @@ export const CampaignCreateWithoutDonationsInputSchema: z.ZodType<Prisma.Campaig
   image: z.string(),
   endDate: z.coerce.date(),
   amountCollected: z.number().optional(),
-  user: z.lazy(() => UserCreateNestedOneWithoutCampaignsInputSchema)
+  user: z.lazy(() => UserCreateNestedOneWithoutCampaignsInputSchema),
+  withdrawalRequests: z.lazy(() => WithdrawalRequestCreateNestedManyWithoutCampaignInputSchema).optional()
 }).strict();
 
 export const CampaignUncheckedCreateWithoutDonationsInputSchema: z.ZodType<Prisma.CampaignUncheckedCreateWithoutDonationsInput> = z.object({
@@ -1779,7 +2043,8 @@ export const CampaignUncheckedCreateWithoutDonationsInputSchema: z.ZodType<Prism
   othersType: z.string().optional().nullable(),
   image: z.string(),
   endDate: z.coerce.date(),
-  amountCollected: z.number().optional()
+  amountCollected: z.number().optional(),
+  withdrawalRequests: z.lazy(() => WithdrawalRequestUncheckedCreateNestedManyWithoutCampaignInputSchema).optional()
 }).strict();
 
 export const CampaignCreateOrConnectWithoutDonationsInputSchema: z.ZodType<Prisma.CampaignCreateOrConnectWithoutDonationsInput> = z.object({
@@ -1824,7 +2089,8 @@ export const CampaignUpdateWithoutDonationsInputSchema: z.ZodType<Prisma.Campaig
   image: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   amountCollected: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  user: z.lazy(() => UserUpdateOneRequiredWithoutCampaignsNestedInputSchema).optional()
+  user: z.lazy(() => UserUpdateOneRequiredWithoutCampaignsNestedInputSchema).optional(),
+  withdrawalRequests: z.lazy(() => WithdrawalRequestUpdateManyWithoutCampaignNestedInputSchema).optional()
 }).strict();
 
 export const CampaignUncheckedUpdateWithoutDonationsInputSchema: z.ZodType<Prisma.CampaignUncheckedUpdateWithoutDonationsInput> = z.object({
@@ -1839,6 +2105,7 @@ export const CampaignUncheckedUpdateWithoutDonationsInputSchema: z.ZodType<Prism
   image: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   amountCollected: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  withdrawalRequests: z.lazy(() => WithdrawalRequestUncheckedUpdateManyWithoutCampaignNestedInputSchema).optional()
 }).strict();
 
 export const DonationCreateWithoutUserInputSchema: z.ZodType<Prisma.DonationCreateWithoutUserInput> = z.object({
@@ -1931,6 +2198,76 @@ export const UserUncheckedUpdateWithoutStripeUserInputSchema: z.ZodType<Prisma.U
   campaigns: z.lazy(() => CampaignUncheckedUpdateManyWithoutUserNestedInputSchema).optional()
 }).strict();
 
+export const CampaignCreateWithoutWithdrawalRequestsInputSchema: z.ZodType<Prisma.CampaignCreateWithoutWithdrawalRequestsInput> = z.object({
+  id: z.string().optional(),
+  userName: z.string().optional(),
+  title: z.string(),
+  story: z.string(),
+  target: z.number(),
+  type: z.lazy(() => CampaignTypeSchema),
+  othersType: z.string().optional().nullable(),
+  image: z.string(),
+  endDate: z.coerce.date(),
+  amountCollected: z.number().optional(),
+  user: z.lazy(() => UserCreateNestedOneWithoutCampaignsInputSchema),
+  donations: z.lazy(() => DonationCreateNestedManyWithoutCampaignInputSchema).optional()
+}).strict();
+
+export const CampaignUncheckedCreateWithoutWithdrawalRequestsInputSchema: z.ZodType<Prisma.CampaignUncheckedCreateWithoutWithdrawalRequestsInput> = z.object({
+  id: z.string().optional(),
+  userName: z.string().optional(),
+  userId: z.string(),
+  title: z.string(),
+  story: z.string(),
+  target: z.number(),
+  type: z.lazy(() => CampaignTypeSchema),
+  othersType: z.string().optional().nullable(),
+  image: z.string(),
+  endDate: z.coerce.date(),
+  amountCollected: z.number().optional(),
+  donations: z.lazy(() => DonationUncheckedCreateNestedManyWithoutCampaignInputSchema).optional()
+}).strict();
+
+export const CampaignCreateOrConnectWithoutWithdrawalRequestsInputSchema: z.ZodType<Prisma.CampaignCreateOrConnectWithoutWithdrawalRequestsInput> = z.object({
+  where: z.lazy(() => CampaignWhereUniqueInputSchema),
+  create: z.union([ z.lazy(() => CampaignCreateWithoutWithdrawalRequestsInputSchema),z.lazy(() => CampaignUncheckedCreateWithoutWithdrawalRequestsInputSchema) ]),
+}).strict();
+
+export const CampaignUpsertWithoutWithdrawalRequestsInputSchema: z.ZodType<Prisma.CampaignUpsertWithoutWithdrawalRequestsInput> = z.object({
+  update: z.union([ z.lazy(() => CampaignUpdateWithoutWithdrawalRequestsInputSchema),z.lazy(() => CampaignUncheckedUpdateWithoutWithdrawalRequestsInputSchema) ]),
+  create: z.union([ z.lazy(() => CampaignCreateWithoutWithdrawalRequestsInputSchema),z.lazy(() => CampaignUncheckedCreateWithoutWithdrawalRequestsInputSchema) ]),
+}).strict();
+
+export const CampaignUpdateWithoutWithdrawalRequestsInputSchema: z.ZodType<Prisma.CampaignUpdateWithoutWithdrawalRequestsInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  userName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  story: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  target: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  type: z.union([ z.lazy(() => CampaignTypeSchema),z.lazy(() => EnumCampaignTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  othersType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  image: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  amountCollected: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  user: z.lazy(() => UserUpdateOneRequiredWithoutCampaignsNestedInputSchema).optional(),
+  donations: z.lazy(() => DonationUpdateManyWithoutCampaignNestedInputSchema).optional()
+}).strict();
+
+export const CampaignUncheckedUpdateWithoutWithdrawalRequestsInputSchema: z.ZodType<Prisma.CampaignUncheckedUpdateWithoutWithdrawalRequestsInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  userName: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  title: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  story: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  target: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  type: z.union([ z.lazy(() => CampaignTypeSchema),z.lazy(() => EnumCampaignTypeFieldUpdateOperationsInputSchema) ]).optional(),
+  othersType: z.union([ z.string(),z.lazy(() => NullableStringFieldUpdateOperationsInputSchema) ]).optional().nullable(),
+  image: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
+  amountCollected: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+  donations: z.lazy(() => DonationUncheckedUpdateManyWithoutCampaignNestedInputSchema).optional()
+}).strict();
+
 export const CampaignCreateManyUserInputSchema: z.ZodType<Prisma.CampaignCreateManyUserInput> = z.object({
   id: z.string().uuid().optional(),
   userName: z.string().optional(),
@@ -1955,7 +2292,8 @@ export const CampaignUpdateWithoutUserInputSchema: z.ZodType<Prisma.CampaignUpda
   image: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   amountCollected: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  donations: z.lazy(() => DonationUpdateManyWithoutCampaignNestedInputSchema).optional()
+  donations: z.lazy(() => DonationUpdateManyWithoutCampaignNestedInputSchema).optional(),
+  withdrawalRequests: z.lazy(() => WithdrawalRequestUpdateManyWithoutCampaignNestedInputSchema).optional()
 }).strict();
 
 export const CampaignUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.CampaignUncheckedUpdateWithoutUserInput> = z.object({
@@ -1969,7 +2307,8 @@ export const CampaignUncheckedUpdateWithoutUserInputSchema: z.ZodType<Prisma.Cam
   image: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   endDate: z.union([ z.coerce.date(),z.lazy(() => DateTimeFieldUpdateOperationsInputSchema) ]).optional(),
   amountCollected: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
-  donations: z.lazy(() => DonationUncheckedUpdateManyWithoutCampaignNestedInputSchema).optional()
+  donations: z.lazy(() => DonationUncheckedUpdateManyWithoutCampaignNestedInputSchema).optional(),
+  withdrawalRequests: z.lazy(() => WithdrawalRequestUncheckedUpdateManyWithoutCampaignNestedInputSchema).optional()
 }).strict();
 
 export const CampaignUncheckedUpdateManyWithoutCampaignsInputSchema: z.ZodType<Prisma.CampaignUncheckedUpdateManyWithoutCampaignsInput> = z.object({
@@ -1992,6 +2331,11 @@ export const DonationCreateManyCampaignInputSchema: z.ZodType<Prisma.DonationCre
   anonymous: z.boolean().optional()
 }).strict();
 
+export const WithdrawalRequestCreateManyCampaignInputSchema: z.ZodType<Prisma.WithdrawalRequestCreateManyCampaignInput> = z.object({
+  id: z.string().uuid().optional(),
+  amount: z.number()
+}).strict();
+
 export const DonationUpdateWithoutCampaignInputSchema: z.ZodType<Prisma.DonationUpdateWithoutCampaignInput> = z.object({
   id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   amount: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
@@ -2011,6 +2355,21 @@ export const DonationUncheckedUpdateManyWithoutDonationsInputSchema: z.ZodType<P
   userId: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
   amount: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
   anonymous: z.union([ z.boolean(),z.lazy(() => BoolFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const WithdrawalRequestUpdateWithoutCampaignInputSchema: z.ZodType<Prisma.WithdrawalRequestUpdateWithoutCampaignInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  amount: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const WithdrawalRequestUncheckedUpdateWithoutCampaignInputSchema: z.ZodType<Prisma.WithdrawalRequestUncheckedUpdateWithoutCampaignInput> = z.object({
+  id: z.union([ z.string(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  amount: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
+}).strict();
+
+export const WithdrawalRequestUncheckedUpdateManyWithoutWithdrawalRequestsInputSchema: z.ZodType<Prisma.WithdrawalRequestUncheckedUpdateManyWithoutWithdrawalRequestsInput> = z.object({
+  id: z.union([ z.string().uuid(),z.lazy(() => StringFieldUpdateOperationsInputSchema) ]).optional(),
+  amount: z.union([ z.number(),z.lazy(() => FloatFieldUpdateOperationsInputSchema) ]).optional(),
 }).strict();
 
 export const DonationCreateManyUserInputSchema: z.ZodType<Prisma.DonationCreateManyUserInput> = z.object({
@@ -2286,6 +2645,68 @@ export const StripeUserFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.StripeUserF
   where: StripeUserWhereUniqueInputSchema,
 }).strict()
 
+export const WithdrawalRequestFindFirstArgsSchema: z.ZodType<Prisma.WithdrawalRequestFindFirstArgs> = z.object({
+  select: WithdrawalRequestSelectSchema.optional(),
+  include: WithdrawalRequestIncludeSchema.optional(),
+  where: WithdrawalRequestWhereInputSchema.optional(),
+  orderBy: z.union([ WithdrawalRequestOrderByWithRelationInputSchema.array(),WithdrawalRequestOrderByWithRelationInputSchema ]).optional(),
+  cursor: WithdrawalRequestWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: WithdrawalRequestScalarFieldEnumSchema.array().optional(),
+}).strict()
+
+export const WithdrawalRequestFindFirstOrThrowArgsSchema: z.ZodType<Prisma.WithdrawalRequestFindFirstOrThrowArgs> = z.object({
+  select: WithdrawalRequestSelectSchema.optional(),
+  include: WithdrawalRequestIncludeSchema.optional(),
+  where: WithdrawalRequestWhereInputSchema.optional(),
+  orderBy: z.union([ WithdrawalRequestOrderByWithRelationInputSchema.array(),WithdrawalRequestOrderByWithRelationInputSchema ]).optional(),
+  cursor: WithdrawalRequestWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: WithdrawalRequestScalarFieldEnumSchema.array().optional(),
+}).strict()
+
+export const WithdrawalRequestFindManyArgsSchema: z.ZodType<Prisma.WithdrawalRequestFindManyArgs> = z.object({
+  select: WithdrawalRequestSelectSchema.optional(),
+  include: WithdrawalRequestIncludeSchema.optional(),
+  where: WithdrawalRequestWhereInputSchema.optional(),
+  orderBy: z.union([ WithdrawalRequestOrderByWithRelationInputSchema.array(),WithdrawalRequestOrderByWithRelationInputSchema ]).optional(),
+  cursor: WithdrawalRequestWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+  distinct: WithdrawalRequestScalarFieldEnumSchema.array().optional(),
+}).strict()
+
+export const WithdrawalRequestAggregateArgsSchema: z.ZodType<Prisma.WithdrawalRequestAggregateArgs> = z.object({
+  where: WithdrawalRequestWhereInputSchema.optional(),
+  orderBy: z.union([ WithdrawalRequestOrderByWithRelationInputSchema.array(),WithdrawalRequestOrderByWithRelationInputSchema ]).optional(),
+  cursor: WithdrawalRequestWhereUniqueInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const WithdrawalRequestGroupByArgsSchema: z.ZodType<Prisma.WithdrawalRequestGroupByArgs> = z.object({
+  where: WithdrawalRequestWhereInputSchema.optional(),
+  orderBy: z.union([ WithdrawalRequestOrderByWithAggregationInputSchema.array(),WithdrawalRequestOrderByWithAggregationInputSchema ]).optional(),
+  by: WithdrawalRequestScalarFieldEnumSchema.array(),
+  having: WithdrawalRequestScalarWhereWithAggregatesInputSchema.optional(),
+  take: z.number().optional(),
+  skip: z.number().optional(),
+}).strict()
+
+export const WithdrawalRequestFindUniqueArgsSchema: z.ZodType<Prisma.WithdrawalRequestFindUniqueArgs> = z.object({
+  select: WithdrawalRequestSelectSchema.optional(),
+  include: WithdrawalRequestIncludeSchema.optional(),
+  where: WithdrawalRequestWhereUniqueInputSchema,
+}).strict()
+
+export const WithdrawalRequestFindUniqueOrThrowArgsSchema: z.ZodType<Prisma.WithdrawalRequestFindUniqueOrThrowArgs> = z.object({
+  select: WithdrawalRequestSelectSchema.optional(),
+  include: WithdrawalRequestIncludeSchema.optional(),
+  where: WithdrawalRequestWhereUniqueInputSchema,
+}).strict()
+
 export const UserCreateArgsSchema: z.ZodType<Prisma.UserCreateArgs> = z.object({
   select: UserSelectSchema.optional(),
   include: UserIncludeSchema.optional(),
@@ -2448,4 +2869,45 @@ export const StripeUserUpdateManyArgsSchema: z.ZodType<Prisma.StripeUserUpdateMa
 
 export const StripeUserDeleteManyArgsSchema: z.ZodType<Prisma.StripeUserDeleteManyArgs> = z.object({
   where: StripeUserWhereInputSchema.optional(),
+}).strict()
+
+export const WithdrawalRequestCreateArgsSchema: z.ZodType<Prisma.WithdrawalRequestCreateArgs> = z.object({
+  select: WithdrawalRequestSelectSchema.optional(),
+  include: WithdrawalRequestIncludeSchema.optional(),
+  data: z.union([ WithdrawalRequestCreateInputSchema,WithdrawalRequestUncheckedCreateInputSchema ]),
+}).strict()
+
+export const WithdrawalRequestUpsertArgsSchema: z.ZodType<Prisma.WithdrawalRequestUpsertArgs> = z.object({
+  select: WithdrawalRequestSelectSchema.optional(),
+  include: WithdrawalRequestIncludeSchema.optional(),
+  where: WithdrawalRequestWhereUniqueInputSchema,
+  create: z.union([ WithdrawalRequestCreateInputSchema,WithdrawalRequestUncheckedCreateInputSchema ]),
+  update: z.union([ WithdrawalRequestUpdateInputSchema,WithdrawalRequestUncheckedUpdateInputSchema ]),
+}).strict()
+
+export const WithdrawalRequestCreateManyArgsSchema: z.ZodType<Prisma.WithdrawalRequestCreateManyArgs> = z.object({
+  data: z.union([ WithdrawalRequestCreateManyInputSchema,WithdrawalRequestCreateManyInputSchema.array() ]),
+  skipDuplicates: z.boolean().optional(),
+}).strict()
+
+export const WithdrawalRequestDeleteArgsSchema: z.ZodType<Prisma.WithdrawalRequestDeleteArgs> = z.object({
+  select: WithdrawalRequestSelectSchema.optional(),
+  include: WithdrawalRequestIncludeSchema.optional(),
+  where: WithdrawalRequestWhereUniqueInputSchema,
+}).strict()
+
+export const WithdrawalRequestUpdateArgsSchema: z.ZodType<Prisma.WithdrawalRequestUpdateArgs> = z.object({
+  select: WithdrawalRequestSelectSchema.optional(),
+  include: WithdrawalRequestIncludeSchema.optional(),
+  data: z.union([ WithdrawalRequestUpdateInputSchema,WithdrawalRequestUncheckedUpdateInputSchema ]),
+  where: WithdrawalRequestWhereUniqueInputSchema,
+}).strict()
+
+export const WithdrawalRequestUpdateManyArgsSchema: z.ZodType<Prisma.WithdrawalRequestUpdateManyArgs> = z.object({
+  data: z.union([ WithdrawalRequestUpdateManyMutationInputSchema,WithdrawalRequestUncheckedUpdateManyInputSchema ]),
+  where: WithdrawalRequestWhereInputSchema.optional(),
+}).strict()
+
+export const WithdrawalRequestDeleteManyArgsSchema: z.ZodType<Prisma.WithdrawalRequestDeleteManyArgs> = z.object({
+  where: WithdrawalRequestWhereInputSchema.optional(),
 }).strict()
