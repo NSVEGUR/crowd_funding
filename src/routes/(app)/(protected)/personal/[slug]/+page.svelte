@@ -84,14 +84,14 @@
 			action="?/update"
 			method="POST"
 			use:enhance={({ data: formData }) => {
-				snackbar.promise('Creating campaign...');
+				snackbar.promise('Updating campaign...');
 				formData.append('campaignId', campaign.id);
 				formData.append('imgChanged', imgUrl == previousImgUrl ? 'false' : 'true');
 				return async function ({ result }) {
 					if (result.type == 'success' || result.type == 'redirect') {
-						snackbar.success('Created campaign successfully');
+						snackbar.success('Updating campaign successfully');
 					} else if (result.type == 'failure' || result.type == 'error') {
-						snackbar.error('Error in creating');
+						snackbar.error('Updating in creating');
 					}
 					await applyAction(result);
 				};
