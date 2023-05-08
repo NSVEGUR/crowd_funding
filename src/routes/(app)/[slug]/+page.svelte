@@ -99,7 +99,7 @@
 	<h1 class="text-center text-5xl font-bold mb-5">
 		{campaign.title} ({campaign.type === 'Others' ? campaign.othersType : campaign.type})
 	</h1>
-	<div class="flex gap-2 w-full items-start -md:flex-col -md:mb-24">
+	<div class="flex gap-7 w-full items-start -md:flex-col -md:mb-24">
 		<div class="w-[70%] -lg:w-[60%] -md:w-full">
 			<div class="relative rounded-lg group overflow-hidden">
 				{#if imgUrl}

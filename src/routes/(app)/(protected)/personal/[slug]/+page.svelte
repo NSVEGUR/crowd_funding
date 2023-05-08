@@ -237,7 +237,7 @@
 		<h1 class="text-center text-5xl font-bold mb-5">
 			{campaign.title} ({campaign.type === 'Others' ? campaign.othersType : campaign.type})
 		</h1>
-		<div class="flex gap-2 w-full items-start -md:flex-col -md:mb-24">
+		<div class="flex gap-7 w-full items-start -md:flex-col -md:mb-24">
 			<div class="w-[70%] -lg:w-[60%] -md:w-full">
 				<div class="relative rounded-lg group overflow-hidden">
 					{#if imgUrl}
@@ -313,7 +313,11 @@
 							data.append('amount', `${amount}`);
 							return async function ({ result }) {
 								if (result.type == 'success' || result.type == 'redirect') {
-									snackbar.success('Requested Withdrawal');
+									snackbar.success(
+										'Please allow us 1 business day to process your amount',
+										'',
+										8000
+									);
 								}
 								await applyAction(result);
 							};

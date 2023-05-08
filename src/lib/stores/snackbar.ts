@@ -5,6 +5,7 @@ export interface SnackBar {
 	message: string;
 	icon: string;
 	style: string;
+	time: number;
 }
 
 export enum Status {
@@ -19,36 +20,40 @@ const createSnackBar = () => {
 		status: Status.IDLE,
 		message: '',
 		icon: '🤡',
-		style: ''
+		style: '',
+		time: 4000
 	};
 	const { subscribe, set, update } = writable(snackbar);
-	const error = function (message: string, style = '') {
+	const error = function (message: string, style = '', time = 4000) {
 		update(() => {
 			return {
 				status: Status.ERROR,
 				message,
 				icon: '❌',
-				style
+				style,
+				time
 			};
 		});
 	};
-	const success = function (message: string, style = '') {
+	const success = function (message: string, style = '', time = 4000) {
 		update(() => {
 			return {
 				status: Status.SUCCESS,
 				message,
 				icon: '✅',
-				style
+				style,
+				time
 			};
 		});
 	};
-	const promise = function (message: string, style = '') {
+	const promise = function (message: string, style = '', time = 4000) {
 		update(() => {
 			return {
 				status: Status.PROMISE,
 				message,
 				icon: '⏳',
-				style
+				style,
+				time
 			};
 		});
 	};
@@ -58,7 +63,8 @@ const createSnackBar = () => {
 				status: Status.IDLE,
 				message: '',
 				icon: '🤡',
-				style: ''
+				style: '',
+				time: 4000
 			};
 		});
 	};
@@ -77,7 +83,7 @@ export const snackbarHandler = (store: SnackBar) => {
 	if (store.status === Status.ERROR || store.status === Status.SUCCESS) {
 		setTimeout(() => {
 			snackbar.reset();
-		}, 4000);
+		}, store.time);
 	}
 };
 
