@@ -44,7 +44,7 @@
 			<h4 class="text-skin-base font-medium">Crowd Funding</h4>
 		</div>
 	</div>
-	{#if url == '/' || url == '/personal'}
+	{#if url == '/' || url == '/protected'}
 		<div
 			class="-lg:hidden pl-2 flex items-center text-inverted absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[60%] border-[1px] border-base rounded-lg"
 			transition:fly={{ y: -300, duration: 300 }}

@@ -2,7 +2,7 @@
 	import type { Campaign, CampaignType } from '@prisma/client';
 	import CampaignCard from '$lib/components/CampaignCard.svelte';
 	export let type: CampaignType;
-	export let campaignType: 'Public' | 'Personal' = 'Public';
+	export let campaignType: 'Public' | 'Protected' = 'Public';
 	export let campaigns: (Campaign & {
 		user: {
 			email: string;

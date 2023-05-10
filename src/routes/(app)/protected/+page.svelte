@@ -24,19 +24,19 @@
 	});
 </script>
 
-<section>
+<section class="mb-20">
 	{#if data.campaigns && data.campaigns.length > 0}
 		{#if education.length > 0}
-			<CampaignList campaigns={education} type="Education" campaignType="Personal" />
+			<CampaignList campaigns={education} type="Education" campaignType="Protected" />
 		{/if}
 		{#if ngo.length > 0}
-			<CampaignList campaigns={ngo} type="NGO" campaignType="Personal" />
+			<CampaignList campaigns={ngo} type="NGO" campaignType="Protected" />
 		{/if}
 		{#if personal.length > 0}
-			<CampaignList campaigns={personal} type="Personal" campaignType="Personal" />
+			<CampaignList campaigns={personal} type="Personal" campaignType="Protected" />
 		{/if}
 		{#if others.length > 0}
-			<CampaignList campaigns={others} type="Others" campaignType="Personal" />
+			<CampaignList campaigns={others} type="Others" campaignType="Protected" />
 		{/if}
 	{:else}
 		<div class="text-skin-muted">No Campaigns</div>

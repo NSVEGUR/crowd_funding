@@ -20,19 +20,19 @@
 		{
 			name: 'Start Campaign',
 			icon: PlusCircleSVG,
-			href: '/start',
+			href: '/protected/create',
 			active: data.url.includes('/start')
 		},
 		{
 			name: 'My Campaigns',
 			icon: UserCircleSVG,
-			href: '/personal',
-			active: data.url.includes('/personal')
+			href: '/protected',
+			active: data.url.includes('/protected')
 		},
 		{
 			name: 'Logout',
 			icon: LogoutSVG,
-			href: '/',
+			href: '/logout',
 			active: false
 		}
 	];

@@ -95,7 +95,7 @@
 	};
 </script>
 
-<section class="w-full h-full mb-20">
+<section class="w-full h-full mb-20 -md:mb-40">
 	<h1 class="text-center text-5xl font-bold mb-5">
 		{campaign.title} ({campaign.type === 'Others' ? campaign.othersType : campaign.type})
 	</h1>

@@ -5,38 +5,73 @@ import type { CampaignType, Campaign } from '@prisma/client';
 import crypto from 'crypto';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const campaign = await prisma.campaign.findUnique({
-		where: {
-			id: params.slug
-		},
-		include: {
-			donations: {
-				select: {
-					anonymous: true,
-					amount: true,
+	let campaign:
+		| (Campaign & {
+				donations: {
+					anonymous: boolean;
+					amount: number;
 					user: {
-						select: {
-							name: true,
-							email: true
-						}
+						name: string | null;
+						email: string;
+					};
+				}[];
+				withdrawalRequests: {
+					amount: number;
+					createdAt: Date;
+					approved: boolean;
+				}[];
+				user: {
+					email: string;
+					campaigns: {
+						title: string;
+					}[];
+				};
+		  })
+		| null;
+	try {
+		campaign = await prisma.campaign.findUnique({
+			where: {
+				id: params.slug
+			},
+			include: {
+				withdrawalRequests: {
+					select: {
+						amount: true,
+						createdAt: true,
+						approved: true
 					}
 				},
-				orderBy: {
-					amount: 'desc'
-				}
-			},
-			user: {
-				select: {
-					email: true,
-					campaigns: {
-						select: {
-							title: true
+				donations: {
+					select: {
+						anonymous: true,
+						amount: true,
+						user: {
+							select: {
+								name: true,
+								email: true
+							}
+						}
+					},
+					orderBy: {
+						amount: 'desc'
+					}
+				},
+				user: {
+					select: {
+						email: true,
+						campaigns: {
+							select: {
+								title: true
+							}
 						}
 					}
 				}
 			}
-		}
-	});
+		});
+	} catch (err) {
+		console.error(err);
+		throw error(500, "Can't reach database server");
+	}
 	if (!campaign) {
 		throw error(404, 'Campaign not found');
 	}
@@ -46,46 +81,6 @@ export const load: PageServerLoad = async ({ params }) => {
 };
 
 export const actions: Actions = {
-	withdraw: async function ({ request, locals }) {
-		if (!locals.session) {
-			return fail(401, { error: 'Unauthorized, login again' });
-		}
-		const body = Object.fromEntries(await request.formData());
-		const { campaignId, amount } = body;
-		if (!campaignId || !amount) {
-			return fail(400, { error: 'Insufficient data' });
-		}
-		let campaign: Campaign | null;
-		try {
-			campaign = await prisma.campaign.findUnique({
-				where: {
-					id: campaignId as string
-				}
-			});
-		} catch (err) {
-			console.log(err);
-			throw error(500, 'Error occurred during retrieving campaign');
-		}
-		if (!campaign) {
-			throw error(404, 'Campaign not found');
-		}
-		const withdrawal_amount = parseFloat(body.amount as string);
-		if (withdrawal_amount >= campaign.amountCollected) {
-			return fail(400, { error: 'Withdrawal amount exceeded amount collected' });
-		}
-		try {
-			await prisma.withdrawalRequest.create({
-				data: {
-					campaignId: campaign.id,
-					amount: withdrawal_amount
-				}
-			});
-		} catch (err) {
-			console.log(err);
-			throw error(500, 'Error in creating withdrawal request');
-		}
-		throw redirect(303, '/personal');
-	},
 	update: async function ({ request, locals }) {
 		if (!locals.session) {
 			return fail(401, { error: 'Unauthorized, login again' });

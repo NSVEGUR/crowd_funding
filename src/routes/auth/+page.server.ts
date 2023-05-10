@@ -3,7 +3,7 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
 	if (locals.session) {
-		throw redirect(302, '/personal');
+		throw redirect(302, '/protected');
 	}
 };
 
@@ -13,6 +13,11 @@ export const actions: Actions = {
 		if (body.password.length < 6) {
 			return fail(500, {
 				error: 'Password must be at least 6 characters'
+			});
+		}
+		if (body.password != body.confirmPassword) {
+			return fail(500, {
+				error: `Passwords don't match`
 			});
 		}
 		const { error: err } = await locals.supabase.auth.signUp({
@@ -29,7 +34,7 @@ export const actions: Actions = {
 				error: 'Server error. Please try again later'
 			});
 		}
-		throw redirect(302, '/personal');
+		throw redirect(302, '/protected');
 	},
 	login: async function ({ request, locals, url }) {
 		const provider = url.searchParams.get('provider');
@@ -65,6 +70,6 @@ export const actions: Actions = {
 				error: 'Server error. Please try again later'
 			});
 		}
-		throw redirect(302, '/personal');
+		throw redirect(302, '/protected');
 	}
 };

@@ -32,7 +32,9 @@
 		<div class="border-b-[1px] border-base w-full" />
 		<ul class="w-full">
 			<li>
-				<a href="/start" class="p-4 block w-full h-full hover:no-underline hover:bg-light-muted"
+				<a
+					href="/protected/create"
+					class="p-4 block w-full h-full hover:no-underline hover:bg-light-muted"
 					>Start a campaign</a
 				>
 			</li>
@@ -42,7 +44,7 @@
 				>
 			</li>
 			<li>
-				<a href="/personal" class="p-4 block w-full h-full hover:no-underline hover:bg-light-muted"
+				<a href="/protected" class="p-4 block w-full h-full hover:no-underline hover:bg-light-muted"
 					>My campaigns</a
 				>
 			</li>
@@ -53,11 +55,9 @@
 		method="POST"
 		use:enhance={() => {
 			snackbar.promise('Logging out...');
-
 			return async function ({ result }) {
 				if (result.type == 'success' || result.type == 'redirect') {
 					snackbar.success('Logged out');
-					invalidateAll();
 				} else {
 					snackbar.error('Error in logging out');
 				}

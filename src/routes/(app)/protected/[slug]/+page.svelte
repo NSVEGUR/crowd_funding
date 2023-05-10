@@ -3,7 +3,7 @@
 	import { invalidateAll } from '$app/navigation';
 	import { snackbar } from '$lib/stores/snackbar';
 	import Profile from '$lib/images/profile.png';
-	import { getDaysLeft } from '$lib/utils/date';
+	import { getDaysLeft, timestampToDate } from '$lib/utils/date';
 	import type { ActionData, PageData } from './$types';
 	import { supabaseClient } from '$lib/supabase';
 	import { slide } from 'svelte/transition';
@@ -57,17 +57,9 @@
 			console.error('File reader is not supported');
 		}
 	};
-
-	const toggleOuter = (e: MouseEvent) => {
-		const menu = (e.target as HTMLElement).closest('#menu-withdraw');
-		const menuBtn = (e.target as HTMLElement).closest('#menu-withdraw-btn');
-		if (!menu && !menuBtn && toggleWithdraw) {
-			toggleWithdraw = false;
-		}
-	};
 </script>
 
-<section class="w-full h-full mb-20">
+<section class="w-full h-full mb-20 -md:mb-40">
 	{#if toggleEdit}
 		<div class="flex justify-end">
 			<button
@@ -299,46 +291,12 @@
 			</div>
 			<div class="w-[30%] -lg:w-[40%] -md:w-full flex flex-col gap-3">
 				<div class="flex flex-col gap-3 -md:hidden">
-					<form
-						class="flex flex-col gap-2"
-						action="?/withdraw"
-						method="POST"
-						use:enhance={({ data, cancel }) => {
-							if (!amount) {
-								snackbar.error('Please provide amount');
-								return cancel();
-							}
-							snackbar.promise('Requesting for withdrawal...');
-							data.append('campaignId', `${campaign.id}`);
-							data.append('amount', `${amount}`);
-							return async function ({ result }) {
-								if (result.type == 'success' || result.type == 'redirect') {
-									snackbar.success(
-										'Please allow us 1 business day to process your amount',
-										'',
-										8000
-									);
-								}
-								await applyAction(result);
-							};
-						}}
+					<a
+						class="bg-accent rounded-lg p-3 text-center font-medium"
+						href="/protected/{campaign.id}/withdraw"
 					>
-						<input
-							type="number"
-							name="amount"
-							step="0.1"
-							placeholder="100 &#36;"
-							required
-							bind:value={amount}
-							class="bg-muted border-[1px] border-accent focus:outline-none p-3 rounded-lg"
-						/>
-						{#if form?.error}
-							<p class="text-skin-error text-center">{form.error}</p>
-						{/if}
-						<button class="bg-accent rounded-lg p-3" type="submit">
-							<i class="fas fa-dollar-sign" /> Withdraw
-						</button>
-					</form>
+						Withdraw
+					</a>
 					<button
 						class="rounded-lg border-[1px] border-accent p-3"
 						on:click={() => {
@@ -420,6 +378,25 @@
 						{/if}
 					</div>
 				</div>
+				<div class="border-[1px] border-base rounded-lg mt-5">
+					<h1
+						class="text-xl font-bold border-b-[1px] border-base py-2 flex items-baseline gap-2 justify-center"
+					>
+						Withdrawal Requests <i class="fas fa-download text-accent fa-xs" />
+					</h1>
+					<div class="max-h-[500px] overflow-scroll p-3 flex flex-col gap-2">
+						{#each campaign.withdrawalRequests as { amount, createdAt, approved }}
+							<div class="flex justify-between items-center">
+								<div class="text-accent font-medium">{amount} &#36;</div>
+								<div class="text-skin-muted">{timestampToDate(createdAt.toString())}</div>
+								<div class="font-medium">{approved ? 'Approved' : 'Pending'}</div>
+							</div>
+						{/each}
+						{#if campaign.withdrawalRequests.length == 0}
+							<p class="text-skin-muted text-center">No previous withdrawals</p>
+						{/if}
+					</div>
+				</div>
 			</div>
 		</div>
 		<button
@@ -431,64 +408,13 @@
 			<i class="fas fa-pen" />
 		</button>
 		<div class="fixed bottom-0 left-0 w-full bg-dominant p-3 rounded-lg shadow-md md:hidden">
-			<button
-				class="bg-accent text-skin-base p-3 w-full rounded-lg"
-				id="menu-withdraw-btn"
-				on:click={() => {
-					toggleWithdraw = true;
-				}}><i class="fas fa-dollar-sign" /><span>Withdraw</span></button
+			<a
+				class="bg-accent text-skin-base p-3 w-full rounded-lg text-center flex items-center justify-center font-medium"
+				href="/protected/{campaign.id}/withdraw">Withdraw</a
 			>
 		</div>
 	{/if}
 </section>
-
-{#if toggleWithdraw}
-	<section class="md:hidden">
-		<div class="fixed h-full w-full bg-black bg-opacity-40 inset-0" />
-		<div class="fixed w-full bottom-0 right-0 shadow-xl" transition:slide>
-			<menu class="bg-muted w-full h-full rounded-t-lg p-5" id="menu-withdraw">
-				<form
-					class="flex flex-col gap-2"
-					action="?/withdraw"
-					method="POST"
-					use:enhance={({ data, cancel }) => {
-						if (!amount) {
-							snackbar.error('Please provide amount');
-							return cancel();
-						}
-						snackbar.promise('Requesting for withdrawal...');
-						data.append('campaignId', `${campaign.id}`);
-						data.append('amount', `${amount}`);
-						return async function ({ result }) {
-							if (result.type == 'success' || result.type == 'redirect') {
-								snackbar.success('Requested Withdrawal');
-							}
-							await applyAction(result);
-						};
-					}}
-				>
-					<input
-						type="number"
-						name="amount"
-						step="0.1"
-						placeholder="100 &#36;"
-						required
-						bind:value={amount}
-						class="bg-muted border-[1px] border-accent focus:outline-none p-3 rounded-lg"
-					/>
-					{#if form?.error}
-						<p class="text-skin-error text-center">{form.error}</p>
-					{/if}
-					<button class="bg-accent rounded-lg p-3" type="submit">
-						<i class="fas fa-dollar-sign" /> Withdraw
-					</button>
-				</form>
-			</menu>
-		</div>
-	</section>
-{/if}
-
-<svelte:window on:click={toggleOuter} />
 
 <style>
 	input::-webkit-outer-spin-button,

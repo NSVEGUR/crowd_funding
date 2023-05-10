@@ -137,6 +137,17 @@
 				placeholder="Password"
 			/>
 		</div>
+		<div class="flex flex-col min-w-[30%] gap-1">
+			<label for="confirmPassword">Confirm Password *</label>
+			<input
+				type="password"
+				name="confirmPassword"
+				required
+				minlength="6"
+				class="bg-transparent focus:outline-none border-[1px] border-base p-3 rounded-lg w-full"
+				placeholder="Confirm Password"
+			/>
+		</div>
 		{#if error}
 			<div>
 				<h1 class="text-center text-skin-error">{error}</h1>

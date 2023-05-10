@@ -6,19 +6,23 @@ export const load: PageServerLoad = async ({ locals }) => {
 	if (!locals.session) {
 		throw error(401, { message: 'Unauthorized, login again' });
 	}
-	const campaigns = await prisma.campaign.findMany({
-		where: {
-			userId: locals.session.user.id
-		},
-		include: {
-			user: {
-				select: {
-					email: true
+	try {
+		const campaigns = await prisma.campaign.findMany({
+			where: {
+				userId: locals.session.user.id
+			},
+			include: {
+				user: {
+					select: {
+						email: true
+					}
 				}
 			}
-		}
-	});
-	return {
-		campaigns: campaigns
-	};
+		});
+		return {
+			campaigns: campaigns
+		};
+	} catch (err) {
+		throw error(500, "Can't reach database server");
+	}
 };

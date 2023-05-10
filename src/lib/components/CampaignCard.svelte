@@ -8,7 +8,7 @@
 			email: string;
 		};
 	};
-	export let type: 'Public' | 'Personal';
+	export let type: 'Public' | 'Protected';
 	let imageUrl: string | null = null;
 	const downloadImage = async (path: string) => {
 		try {
@@ -32,7 +32,7 @@
 
 <a
 	class="group h-96 shadow-lg transition-all duration-500 rounded-xl flex flex-col cursor-pointer justify-evenly"
-	href="{type == 'Personal' ? `/${type.toLowerCase()}` : ''}/{campaign.id}"
+	href="{type === 'Protected' ? `${type.toLowerCase()}` : ''}/{campaign.id}"
 >
 	<div
 		class="h-[65%] relative group-hover:h-[45%] transition-all duration-500 overflow-hidden rounded-t-xl"

@@ -16,6 +16,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		event = stripe.webhooks.constructEvent(payload, signature, STRIPE_WEBHOOK_SECRET);
 	} catch (err) {
 		console.warn('🚧 Webhook signature verification failed');
+		console.error(err);
 		return json({ error: 'Webhook error' }, { status: 400 });
 	}
 	if (event.type == 'checkout.session.completed') {

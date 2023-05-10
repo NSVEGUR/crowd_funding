@@ -3,40 +3,63 @@ import { prisma } from '$lib/server/prisma';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { DOMAIN_ADDRESS } from '$env/static/private';
 import { stripe } from '$lib/server/stripe';
+import type { Campaign } from '@prisma/client';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const campaign = await prisma.campaign.findUnique({
-		where: {
-			id: params.slug
-		},
-		include: {
-			donations: {
-				select: {
-					anonymous: true,
-					amount: true,
+	let campaign:
+		| (Campaign & {
+				donations: {
+					anonymous: boolean;
+					amount: number;
 					user: {
-						select: {
-							name: true,
-							email: true
+						name: string | null;
+						email: string;
+					};
+				}[];
+				user: {
+					email: string;
+					campaigns: {
+						title: string;
+					}[];
+				};
+		  })
+		| null;
+	try {
+		campaign = await prisma.campaign.findUnique({
+			where: {
+				id: params.slug
+			},
+			include: {
+				donations: {
+					select: {
+						anonymous: true,
+						amount: true,
+						user: {
+							select: {
+								name: true,
+								email: true
+							}
 						}
+					},
+					orderBy: {
+						amount: 'desc'
 					}
 				},
-				orderBy: {
-					amount: 'desc'
-				}
-			},
-			user: {
-				select: {
-					email: true,
-					campaigns: {
-						select: {
-							title: true
+				user: {
+					select: {
+						email: true,
+						campaigns: {
+							select: {
+								title: true
+							}
 						}
 					}
 				}
 			}
-		}
-	});
+		});
+	} catch (err) {
+		throw error(500, "Can't reach database server");
+	}
 	if (!campaign) {
 		throw error(404, 'Campaign not found');
 	}
@@ -58,7 +81,7 @@ export const actions: Actions = {
 		}
 		const unit_amount_decimal = (parseFloat(amount) * 100).toFixed(4);
 		const price = await stripe.prices.create({
-			currency: 'usd',
+			currency: 'cad',
 			unit_amount_decimal,
 			product: campaignId
 		});

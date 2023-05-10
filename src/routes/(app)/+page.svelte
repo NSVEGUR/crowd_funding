@@ -24,7 +24,7 @@
 	});
 </script>
 
-<section>
+<section class="mb-20">
 	{#if data.campaigns && data.campaigns.length > 0}
 		{#if education.length > 0}
 			<CampaignList campaigns={education} type="Education" />

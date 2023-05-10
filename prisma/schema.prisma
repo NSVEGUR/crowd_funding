@@ -84,5 +84,10 @@ model WithdrawalRequest{
   campaignId String
   campaign Campaign @relation(fields: [campaignId], references: [id])
   amount Float
+  createdAt DateTime @default(now())
+  transitNumber Int
+  institutionNumber Int
+  accountNumber Int
+  approved Boolean @default(false)
   @@map("withdrawal_requests")
 }

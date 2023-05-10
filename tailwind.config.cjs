@@ -23,7 +23,8 @@ const config = {
 				}
 			},
 			borderColor: {
-				base: '#DFDFE1'
+				base: '#DFDFE1',
+				complementary: '#000000'
 			},
 			backgroundImage: {
 				'gradient-dominant': `linear-gradient(120deg, #fdfbfb 0%, #ebedee 100%);`,

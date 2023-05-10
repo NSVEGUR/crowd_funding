@@ -34,7 +34,7 @@
 		id="nav"
 	>
 		<ul class="mt-5 p-3 flex flex-col items-start gap-3 w-full h-full text-accent">
-			{#each hyperlinks as link, index}
+			{#each hyperlinks as link}
 				{#if link.name === 'Logout'}
 					<li class="-lg:w-full">
 						<form
@@ -45,7 +45,6 @@
 								return async function ({ result }) {
 									if (result.type == 'success' || result.type == 'redirect') {
 										snackbar.success('Logged out');
-										invalidateAll();
 									} else {
 										snackbar.error('Error in logging out');
 									}
