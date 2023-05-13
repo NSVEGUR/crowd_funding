@@ -123,10 +123,10 @@
 					</div>
 					<div>
 						<h1 class="text-2xl font-semibold">
-							{data.campaign.amountCollected.toLocaleString('en-US')}
+							${data.campaign.amountCollected.toLocaleString('en-US')}
 						</h1>
 						<h2 class="font-medium text-xl">
-							Raised of {data.campaign.target.toLocaleString('en-US')}
+							Raised of ${data.campaign.target.toLocaleString('en-US')}
 						</h2>
 					</div>
 					<div>
@@ -160,8 +160,8 @@
 			</div>
 		</div>
 		<div class="w-[30%] -lg:w-[40%] -md:w-full flex flex-col gap-3">
-			<div class="flex flex-col gap-3 -md:hidden">
-				<div class="flex justify-evenly">
+			<div class="flex flex-col gap-3">
+				<div class="flex justify-evenly  -md:hidden">
 					{#each donationSuggestions as { amount: donation, active }, index}
 						<button
 							class="border-[1px] border-accent p-1 rounded-lg text-center w-16 {active
@@ -197,11 +197,11 @@
 						step="0.1"
 						placeholder="500 &#36;"
 						bind:value={amount}
-						class="bg-muted border-[1px] border-accent focus:outline-none p-3 rounded-lg"
+						class="bg-muted border-[1px] border-accent focus:outline-none p-3 rounded-lg  -md:hidden"
 					/>
 				{/if}
 				<form
-					class="flex flex-col gap-2"
+					class="flex flex-col gap-2  -md:hidden"
 					action="?/donate"
 					method="POST"
 					use:enhance={({ data, cancel }) => {
@@ -231,7 +231,7 @@
 					</button>
 				</form>
 				<button
-					class="rounded-lg border-[1px] border-accent p-3"
+					class="rounded-lg border-[1px] border-accent p-3  -md:hidden"
 					id="menu-share-btn"
 					on:click={() => {
 						toggleDonate = false;

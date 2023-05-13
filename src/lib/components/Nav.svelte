@@ -2,7 +2,6 @@
 	import { onMount } from 'svelte';
 	import { toggleNav } from '$lib/stores';
 	import { enhance, applyAction } from '$app/forms';
-	import { invalidateAll } from '$app/navigation';
 	import { snackbar } from '$lib/stores/snackbar';
 
 	onMount(() => {
@@ -13,6 +12,7 @@
 					link.active = false;
 				});
 				hyperlinks[index].active = true;
+				$toggleNav = false;
 			});
 		});
 	});
